@@ -1,0 +1,27 @@
+app.localhost {
+    tls internal
+    log {
+        # output logs to standard error (console)
+        output stderr
+    }
+
+    root * /srv/public
+
+    encode zstd gzip
+    import ./security
+    # Or serve a PHP site through php-fpm:
+    php_fastcgi app:9000 {
+        root /var/www/public
+    }
+    file_server
+}
+
+phpmyadmin.localhost {
+  	tls internal
+	reverse_proxy phpmyadmin:80
+}
+
+mailhog.localhost {
+  	tls internal
+	reverse_proxy mailhog:8025
+}
