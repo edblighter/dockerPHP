@@ -1,0 +1,52 @@
+services:
+  db:
+    image: mysql:8
+    container_name: ${MYSQL_CONTAINER_NAME}
+    restart: unless-stopped
+    env_file:
+      - path: ./mysql.env
+        required: true
+      - path: ./app.env
+        required: true
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password # openssl rand -base64 20 | sudo docker secret create db_root_password -
+      MYSQL_DATABASE: ${APP_DATABASE_NAME}
+      MYSQL_USER: ${APP_MYSQL_USER}
+      MYSQL_PASSWORD: ${APP_MYSQL_PASSWORD}
+      MYSQL_ROOT_HOST: "%"
+      TZ: ${APP_TIMEZONE}
+    secrets:
+      - db_root_password
+    ports:
+      - ${MYSQL_PORT}:3306
+    expose:
+      - ${MYSQL_PORT}
+    volumes:
+      - ${MYSQLDATA_PATH}:/var/lib/mysql
+    networks:
+      - ${APP_NETWORK_NAME}
+  phpadmin:
+    image: phpmyadmin:latest
+    container_name: ${PHPMYADMIN_CONTAINER_NAME}
+    restart: always
+    env_file:
+      - path: ./mysql.env
+        required: true
+      - path: ./app.env
+        required: true
+    depends_on:
+      - db
+    environment:
+      PMA_ABSOLUTE_URI: ${PHPMYADMIN_URL}
+      PMA_HOST: db
+      PMA_USER: ${APP_MYSQL_USER}
+      PMA_PASSWORD: ${APP_MYSQL_PASSWORD}
+      UPLOAD_LIMIT: 100M
+      MEMORY_LIMIT: 2G
+      MAX_EXECUTION_TIME: 600
+      PMA_PORT: ${MYSQL_PORT}
+      TZ: ${APP_TIMEZONE}
+    expose:
+      - 80
+    networks:
+      - ${APP_NETWORK_NAME}

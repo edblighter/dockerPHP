@@ -1,9 +1,60 @@
+# This image is intended to be a complete build 
+# with mysql,postgres and sqlite drivers
 FROM php:8.3-fpm
 
 # Install dependencies
-RUN apt-get update && apt-get install -y \
-    git curl libpng-dev libonig-dev libxml2-dev zip unzip default-mysql-client \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+RUN set -eux; \
+    apt-get update; \
+    apt-get upgrade -y; \
+    apt-get install -y --no-install-recommends \
+        git \
+        curl \
+        libsodium-dev \
+        libmemcached-dev \
+        libcurl4-gnutls-dev \
+        libz-dev \
+        libpq-dev \
+        libjpeg-dev \
+        libpng-dev \
+        libfreetype6-dev \
+        libssl-dev \
+        libwebp-dev \
+        libxpm-dev \
+        libmcrypt-dev \
+        libonig-dev \
+        libxml2-dev \
+        libsqlite3-dev \
+        sqlite3 \
+        libzip-dev \
+        zip \
+        unzip \
+        default-mysql-client \
+        postgresql-client; \
+    apt-get autoclean; \
+    apt-get autoremove -y; \
+    rm -rf /var/lib/apt/lists/*
+
+RUN set -eux; \  
+    docker-php-ext-install pdo_mysql \
+        pdo_pgsql \
+        pdo_sqlite \
+        mbstring \
+        exif \
+        pcntl \
+        bcmath \
+        zip \
+        xml \
+        pgsql \
+        sodium \
+        intl \
+        curl; \
+    docker-php-ext-configure gd \
+    --prefix=/usr \
+    --with-jpeg \
+    --with-webp \
+    --with-xpm \
+    --with-freetype; \
+    docker-php-ext-install gd; 
 
 RUN usermod -u 1000 www-data
 
@@ -12,12 +63,6 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
-#COPY ./app .
-# Instala as dependências do Laravel
-#RUN composer install --no-dev --optimize-autoloader
-# Adjust www folder owner
-#RUN chown -R 1000:1000 /var/www
-# Adjust www folder permissions
 RUN chmod 755 -R /var/www
 
 CMD ["php-fpm"]

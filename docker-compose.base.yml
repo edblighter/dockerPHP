@@ -2,8 +2,8 @@ services:
   app:
     build:
       context: .
-      dockerfile: docker/php/Dockerfile
-    container_name: laravel_php
+      dockerfile: docker-data/php/Dockerfile
+    container_name: docker_php
     user: 1000:1000
     working_dir: /var/www
     volumes:
@@ -12,21 +12,7 @@ services:
       - db
       - redis
     networks:
-      - laravel_net
-  db:
-    image: mysql:8
-    container_name: laravel_mysql
-    restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: laravel
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: laravel
-      MYSQL_PASSWORD: secret
-      MYSQL_ROOT_HOST: "%"
-    volumes:
-      - ./docker/mysql/mysqldata:/var/lib/mysql
-    networks:
-      - laravel_net
+      - app_net
   redis:
     image: redis:latest
     container_name: laravel_redis
@@ -36,25 +22,6 @@ services:
     command: redis-server --save 20 1 --loglevel warning
     volumes:
       - cache:/data
-    networks:
-      - laravel_net
-  phpmyadmin:
-    image: phpmyadmin:latest
-    container_name: laravel_myadmin
-    restart: always
-    depends_on:
-      - db
-      - web
-    environment:
-      PMA_ABSOLUTE_URI: "https://phpmyadmin.localhost/"
-      PMA_HOST: db
-      PMA_USER: laravel
-      PMA_PASSWORD: "secret"
-      UPLOAD_LIMIT: 100M
-      MEMORY_LIMIT: 2G
-      MAX_EXECUTION_TIME: 600
-    expose:
-      - 80
     networks:
       - laravel_net
   mailhog:

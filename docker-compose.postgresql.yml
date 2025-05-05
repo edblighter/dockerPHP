@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:17-bookworm
+    container_name: ${POSTGRES_CONTAINER_NAME}
+    restart: unless-stopped
+    env_file:
+      - path: ./postgres.env
+        required: true
+      - path: ./app.env
+        required: true
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_root_password # openssl rand -base64 20 | sudo docker secret create db_root_password -
+      POSTGRES_DB: ${APP_DATABASE_NAME}
+      POSTGRES_USER: ${APP_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${APP_POSTGRES_PASSWORD}
+      MYSQL_ROOT_HOST: "%"
+      TZ: ${APP_TIMEZONE}
+    secrets:
+      - db_root_password
+    ports:
+      - ${POSTGRES_PORT}:5432
+    expose:
+      - ${POSTGRES_PORT}
+    volumes:
+      - ${POSTGRESDATA_PATH}:/var/lib/postgresql/data
+    networks:
+      - ${APP_NETWORK_NAME}
+  phpadmin:
+    image: phppgadmin:latest
+    container_name: ${PHPPGADMIN_CONTAINER_NAME}
+    restart: always
+    env_file:
+      - path: ./mysql.env
+        required: true
+      - path: ./app.env
+        required: true
+    depends_on:
+      - db
+    environment:
+      PMA_ABSOLUTE_URI: ${PHPPGADMIN_URL}
+      PMA_HOST: db
+      PMA_USER: ${APP_POSTGRES_USER}
+      PMA_PASSWORD: ${APP_POSTGRES_PASSWORD}
+      UPLOAD_LIMIT: 100M
+      MEMORY_LIMIT: 2G
+      MAX_EXECUTION_TIME: 600
+      PMA_PORT: ${POSTGRES_PORT}
+      TZ: ${APP_TIMEZONE}
+    expose:
+      - 80
+    networks:
+      - ${APP_NETWORK_NAME}
