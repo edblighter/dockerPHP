@@ -3,11 +3,6 @@ services:
     image: postgres:17-bookworm
     container_name: ${POSTGRES_CONTAINER_NAME}
     restart: unless-stopped
-    env_file:
-      - path: ./postgres.env
-        required: true
-      - path: ./app.env
-        required: true
     environment:
       POSTGRES_PASSWORD_FILE: /run/secrets/db_root_password # openssl rand -base64 20 | sudo docker secret create db_root_password -
       POSTGRES_DB: ${APP_DATABASE_NAME}
@@ -29,11 +24,6 @@ services:
     image: phppgadmin:latest
     container_name: ${PHPPGADMIN_CONTAINER_NAME}
     restart: always
-    env_file:
-      - path: ./mysql.env
-        required: true
-      - path: ./app.env
-        required: true
     depends_on:
       - db
     environment:
@@ -50,3 +40,10 @@ services:
       - 80
     networks:
       - ${APP_NETWORK_NAME}
+secrets:
+  db_root_password:
+    file: ../docker-data/postgres/db_root_password.txt
+networks:
+  app_network:
+    name: ${APP_NETWORK_NAME}
+    driver: bridge

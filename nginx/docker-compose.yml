@@ -1,0 +1,52 @@
+services:
+  app:
+    extends:
+      file: $PWD/php/docker-compose.yml
+      service: app
+  db:
+    extends:
+      file: $PWD/$DATABASE/docker-compose.yml
+      service: db
+  phpadmin:
+    extends:
+      file: $PWD/$DATABASE/docker-compose.yml
+      service: phpadmin
+  redis:
+    extends:
+      file: $PWD/redis/docker-compose.yml
+      service: redis
+  mailhog:
+    extends:
+      file: $PWD/mailhog/docker-compose.yml
+      service: mailhog
+  web:
+    image: nginx:alpine
+    container_name: ${APP_NGINX_CONTAINER_NAME}
+    volumes:
+      - app_volume:/var/www
+      - $PWD/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - ${APP_NETWORK_NAME}
+    environment:
+      TZ: ${APP_TIMEZONE}
+    ports:
+      - "${APP_HTTP_PORT}:80"
+volumes:
+  cache:
+    name: redis_cache
+    driver: local
+  app_volume:
+    name: app_volume
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/app
+networks:
+  app_network:
+    name: ${APP_NETWORK_NAME}
+    driver: bridge
+secrets:
+  db_root_password:
+    file: $PWD/docker-data/$DATABASE/db_root_password.txt

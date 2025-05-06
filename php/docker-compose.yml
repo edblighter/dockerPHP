@@ -1,0 +1,25 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: $PWD/php/Dockerfile
+    container_name: ${APP_CONTAINER_NAME}
+    user: 1000:1000
+    working_dir: /var/www
+    volumes:
+      - app_volume:/var/www
+    environment:
+      TZ: ${APP_TIMEZONE}
+    networks:
+      - ${APP_NETWORK_NAME}
+volumes:
+  app_volume:
+    name: app_volume
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/app
+networks:
+  app_network:
+    name: ${APP_NETWORK_NAME}
+    driver: bridge

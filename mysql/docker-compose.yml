@@ -3,13 +3,8 @@ services:
     image: mysql:8
     container_name: ${MYSQL_CONTAINER_NAME}
     restart: unless-stopped
-    env_file:
-      - path: ./mysql.env
-        required: true
-      - path: ./app.env
-        required: true
     environment:
-      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password # openssl rand -base64 20 | sudo docker secret create db_root_password -
+      MYSQL_ROOT_PASSWORD_FILE: "/run/secrets/db_root_password" # openssl rand -base64 20 | sudo docker secret create db_root_password -
       MYSQL_DATABASE: ${APP_DATABASE_NAME}
       MYSQL_USER: ${APP_MYSQL_USER}
       MYSQL_PASSWORD: ${APP_MYSQL_PASSWORD}
@@ -29,11 +24,6 @@ services:
     image: phpmyadmin:latest
     container_name: ${PHPMYADMIN_CONTAINER_NAME}
     restart: always
-    env_file:
-      - path: ./mysql.env
-        required: true
-      - path: ./app.env
-        required: true
     depends_on:
       - db
     environment:
@@ -50,3 +40,10 @@ services:
       - 80
     networks:
       - ${APP_NETWORK_NAME}
+secrets:
+  db_root_password:
+    file: $PWD/docker-data/mysql/db_root_password.txt
+networks:
+  app_network:
+    name: ${APP_NETWORK_NAME}
+    driver: bridge
