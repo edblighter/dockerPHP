@@ -2,55 +2,57 @@
 
 Serviços docker para desenvolvimento em Laravel:
 
--   **PHP-FPM (8.3)**
--   **MySQL (8)**
--   **Redis**
--   **MailHog**
+- **PHP-FPM (8.3)**
+- **MySQL (8)**
+- **PostgreSQL (17)**
+- **Redis**
+- **MailHog**
 
 Voçê pode escolher entre 2 tipos de servidor web
 
--   **Nginx (Alpine)**
--   **Caddy** (Possui suporte automatico a SSL local)
+- **Nginx (Alpine)**
+- **Caddy** (Possui suporte automatico a SSL local)
 
 ---
 
 ## Software obrigatório
 
--   [docker](https://docs.docker.com/engine/install/)
--   [docker compose](https://docs.docker.com/compose/install/)
+- sudo
+- [docker](https://docs.docker.com/engine/install/)
+- [docker compose](https://docs.docker.com/compose/install/)
 
 ## 📦 Comandos a serem executados
 
-Escolha entre o nginx ou caddy para a criação dos serviços:
+Escolha entre o nginx ou caddy para servir como servidor web e mysql ou postgres como banco de dados para criação dos serviços:
 
 ```bash
-cd container
-sudo PWD=${PWD} HTTP_PORT=8000 docker compose -f docker-compose.caddy.yml up -d --build
+./run.sh caddy mysql up
+```
+
+> Para esse exemplo serão gerados os containers **app_php, app_caddy, app_redis, app_mysql, app_mailhog, app_phpmyadmin**, o volume **redis_cache** e a rede **app_network**
+
+e para remover os serviços digite:
+
+```bash
+./run.sh caddy mysql down
 ou
-sudo PWD=${PWD} HTTP_PORT=8000 docker compose -f docker-compose.nginx.yml up -d --build
+./run.sh clear
 ```
 
-> Dependendo de como o docker foi instalado o comando **docker compose** pode ser subtituido por **docker-compose**
-
-> Caso apareça algum problema de permissão ao acessar o sistema rode os comandos:
-
-```bash
-sudo docker exec -it laravel_php sh
-chmod 755 -R *
-exit
-```
-
-> Foram encontrados erros de permissão usando o WSL tanto nos arquivos como na parte de network. É recomendado rodar em uma maquina linux.
+> O script foi escrito utilizando sudo como prefixo para rodar os comandos docker então caso precise executar comandos dentro do docker utilize **sudo docker exec <nome_container>**
 
 ---
 
 Instalando as dependências do projeto:
 
+- clone seu projeto na pasta app `git clone <url> app` e execute os comandos a seguir
+  > a pasta app está linkada ao `/var/www` do servidor web **nginx** ou `/srv` do servidor web **caddy**
+
 ```bash
-sudo docker exec laravel_php composer install --no-dev --optimize-autoloader
+sudo docker exec app_php composer install --no-dev --optimize-autoloader
 cp ./app/.env.example ./app/.env
-sudo docker exec laravel_php php artisan key:generate
-sudo docker exec laravel_php php artisan migrate
+sudo docker exec app_php php artisan key:generate
+sudo docker exec app_php php artisan migrate
 ```
 
 Assim que finalizado o migrate o sistema estará disponivel em [http://app.localhost:8000](http://app.localhost:8000).
@@ -59,19 +61,31 @@ Assim que finalizado o migrate o sistema estará disponivel em [http://app.local
 
 ---
 
+Caso apareça algum problema de permissão ao acessar o sistema rode os comandos:
+
+```bash
+sudo docker exec -it app_php sh
+chmod 755 -R *
+exit
+```
+
+> Foram encontrados erros de permissão usando o WSL tanto nos arquivos como na parte de network. É recomendado rodar em uma maquina linux.
+
+---
+
 Para rodar os testes seguem os comandos
 
 ```bash
-sudo docker exec laravel_php composer install
+sudo docker exec app_php composer install
 cp ./app/.env.example ./app/.env
-sudo docker exec laravel_php php artisan key:generate
-sudo docker exec laravel_php php artisan migrate
-sudo docker exec laravel_php php artisan test
+sudo docker exec app_php php artisan key:generate
+sudo docker exec app_php php artisan migrate
+sudo docker exec app_php php artisan test
 ```
 
 ---
 
 Outros endereços que podem ser utilizados para auxiliar no desenvolvimento com o laravel.
 
--   [PHPMyAdmin](http://phpmyadmin.localhost:8000)
--   [MailHog](http://mailhog.localhost:8000)
+- [DBAdmin](http://dbadmin.localhost:8000) - Aqui dependendo da escolha do banco pode ser o **phpmyadmin** para o MySQL ou **adminer** para o PostgreSQL
+- [MailHog](http://mailhog.localhost:8000)
