@@ -1,27 +1,7 @@
 services:
-  app:
-    extends:
-      file: $PWD/php/docker-compose.yml
-      service: app
-  db:
-    extends:
-      file: $PWD/$DATABASE/docker-compose.yml
-      service: db
-  phpadmin:
-    extends:
-      file: $PWD/$DATABASE/docker-compose.yml
-      service: phpadmin
-  redis:
-    extends:
-      file: $PWD/redis/docker-compose.yml
-      service: redis
-  mailhog:
-    extends:
-      file: $PWD/mailhog/docker-compose.yml
-      service: mailhog
   web:
     image: caddy:latest
-    container_name: ${APP_NGINX_CONTAINER_NAME}
+    container_name: ${APP_CADDY_CONTAINER_NAME}
     restart: unless-stopped
     volumes:
       - $PWD/caddy/CaddyFile:/etc/caddy/Caddyfile:ro
@@ -42,9 +22,6 @@ services:
       - 80 # http
       - 443 # https
 volumes:
-  cache:
-    name: redis_cache
-    driver: local
   app_volume:
     name: app_volume
     driver_opts:
@@ -55,6 +32,3 @@ networks:
   app_network:
     name: ${APP_NETWORK_NAME}
     driver: bridge
-secrets:
-  db_root_password:
-    file: $PWD/docker-data/$DATABASE/db_root_password.txt

@@ -1,0 +1,42 @@
+services:
+  app:
+    extends:
+      file: $PWD/php/docker-compose.yml
+      service: app
+  db:
+    extends:
+      file: $PWD/$DATABASE/docker-compose.yml
+      service: db
+  dbadmin:
+    extends:
+      file: $PWD/$DATABASE/docker-compose.yml
+      service: dbadmin
+  redis:
+    extends:
+      file: $PWD/redis/docker-compose.yml
+      service: redis
+  mailhog:
+    extends:
+      file: $PWD/mailhog/docker-compose.yml
+      service: mailhog
+  web:
+    extends:
+      file: $PWD/$WEB_SERVER/docker-compose.yml
+      service: web
+volumes:
+  cache:
+    name: redis_cache
+    driver: local
+  app_volume:
+    name: app_volume
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/app
+networks:
+  app_network:
+    name: ${APP_NETWORK_NAME}
+    driver: bridge
+secrets:
+  db_root_password:
+    file: $PWD/docker-data/$DATABASE/db_root_password.txt

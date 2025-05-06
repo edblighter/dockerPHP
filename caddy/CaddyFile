@@ -16,9 +16,9 @@ app.localhost {
     file_server
 }
 
-phpmyadmin.localhost {
+dbadmin.localhost {
   	tls internal
-	reverse_proxy phpmyadmin:80
+	reverse_proxy dbadmin:9000
 }
 
 mailhog.localhost {

@@ -20,7 +20,7 @@ services:
       - ${MYSQLDATA_PATH}:/var/lib/mysql
     networks:
       - ${APP_NETWORK_NAME}
-  phpadmin:
+  dbadmin:
     image: phpmyadmin:latest
     container_name: ${PHPMYADMIN_CONTAINER_NAME}
     restart: always
@@ -36,6 +36,8 @@ services:
       MAX_EXECUTION_TIME: 600
       PMA_PORT: ${MYSQL_PORT}
       TZ: ${APP_TIMEZONE}
+    ports:
+      - 9000:80
     expose:
       - 80
     networks:

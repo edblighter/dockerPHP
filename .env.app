@@ -11,18 +11,17 @@ MYSQL_PORT=3306
 MYSQLDATA_PATH="$PWD/docker-data/mysql/mysqldata"
 # PHPMYADMIN
 PHPMYADMIN_CONTAINER_NAME=app_phpmyadmin
-PHPMYADMIN_URL="http://phpadmin.localhost/"
+PHPMYADMIN_URL="http://dbadmin.localhost/"
 
 # POSTGRES ENV
 APP_POSTGRES_USER=laravel
 APP_POSTGRES_PASSWORD=secret
 # POSTGRESQL
 POSTGRES_CONTAINER_NAME=app_postgres
-POSTGRES_PORT=5432
-POSTGRESDATA_PATH="$PWD/docker-data/postgresql/data"
-# PHPPGADMIN
-PHPPGADMIN_CONTAINER_NAME=app_phppgadmin
-PHPPGADMIN_URL="http://phpadmin.localhost/"
+POSTGRES_PORT=54322
+POSTGRESDATA_PATH="$PWD/docker-data/postgres/data"
+# DBADMIN
+DBADMIN_CONTAINER_NAME=app_dbadmin
 
 # REDIS ENV
 APP_REDIS_CONTAINER=app_redis
