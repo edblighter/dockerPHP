@@ -1,52 +1,80 @@
 # Laravel Docker Setup
 
-Serviços docker para desenvolvimento em Laravel:
+Complete Docker environment for Laravel development, including support for multiple databases, web servers, and auxiliary services.
 
-- **PHP-FPM (8.3)**
-- **MySQL (8)**
-- **PostgreSQL (17)**
-- **Redis**
-- **MailHog**
-
-Voçê pode escolher entre 2 tipos de servidor web
-
-- **Nginx (Alpine)**
-- **Caddy** (Possui suporte automatico a SSL local)
+> Also avaiable in [pt_BR](./README.pt_BR.md)
 
 ---
 
-## Software obrigatório
+## 🔧 Available Services
 
-- sudo
-- [docker](https://docs.docker.com/engine/install/)
-- [docker compose](https://docs.docker.com/compose/install/)
+- **PHP-FPM 8.3**
+- **MySQL 8 and PHPMyAdmin**
+- **PostgreSQL 17 and Adminer**
+- **Redis**
+- **MailHog**
 
-## 📦 Comandos a serem executados
+---
 
-Escolha entre o nginx ou caddy para servir como servidor web e mysql ou postgres como banco de dados para criação dos serviços:
+## 🌐 Available Web Servers
+
+Choose between:
+
+- **Nginx (Alpine)** – lightweight and widely used
+- **Caddy** – with automatic local SSL support (self-signed)
+
+---
+
+## ✅ Requirements
+
+Make sure the following software is installed:
+
+- `sudo`
+- [Docker](https://docs.docker.com/engine/install/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+---
+
+## 📦 Commands to Run
+
+Choose the web server (**nginx** or **caddy**) and the database (**mysql** or **postgres**) to spin up the services:
 
 ```bash
 ./run.sh caddy mysql up
 ```
 
-> Para esse exemplo serão gerados os containers **app_php, app_caddy, app_redis, app_mysql, app_mailhog, app_phpmyadmin**, o volume **redis_cache** e a rede **app_network**
+> This command will create the containers: **app_php**, **app_caddy**, **app_redis**, **app_mysql**, **app_mailhog**, **app_phpmyadmin**; along with the volume **redis_cache** and the network **app_network**.
 
-e para remover os serviços digite:
+To remove the services, run:
 
 ```bash
 ./run.sh caddy mysql down
-ou
+# or
 ./run.sh clear
 ```
 
-> O script foi escrito utilizando sudo como prefixo para rodar os comandos docker então caso precise executar comandos dentro do docker utilize **sudo docker exec <nome_container>**
+> 💡 Docker commands use `sudo` by default. To execute commands inside containers, use:
+
+```bash
+sudo docker exec <container_name> <command>
+```
 
 ---
 
-Instalando as dependências do projeto:
+## 📥 Installing Project Dependencies
 
-- clone seu projeto na pasta app `git clone <url> app` e execute os comandos a seguir
-  > a pasta app está linkada ao `/var/www` do servidor web **nginx** ou `/srv` do servidor web **caddy**
+Clone your Laravel project into the `app` folder:
+
+```bash
+git clone <url> app
+```
+
+The `app` folder will be mounted as:
+
+- `/var/www` (for Nginx)
+- `/srv` (for Caddy)
+
+Then run:
 
 ```bash
 sudo docker exec app_php composer install --no-dev --optimize-autoloader
@@ -55,13 +83,16 @@ sudo docker exec app_php php artisan key:generate
 sudo docker exec app_php php artisan migrate
 ```
 
-Assim que finalizado o migrate o sistema estará disponivel em [http://app.localhost:8000](http://app.localhost:8000).
+Access your app via:
 
-> Para o servidor web caddy a url será reescrita para [https://app.localhost](https://app.localhost) e irá emitir que a conexão não é segura e basta ignorar pois é comum para certificados self-signed.
+- **Nginx**: [http://app.localhost:8000](http://app.localhost:8000)
+- **Caddy**: [https://app.localhost](https://app.localhost) _(ignore the security warning — it's common with self-signed certificates)_
 
 ---
 
-Caso apareça algum problema de permissão ao acessar o sistema rode os comandos:
+## 🛠️ Permission Issues
+
+If you encounter permission errors while accessing the system, run:
 
 ```bash
 sudo docker exec -it app_php sh
@@ -69,11 +100,11 @@ chmod 755 -R *
 exit
 ```
 
-> Foram encontrados erros de permissão usando o WSL tanto nos arquivos como na parte de network. É recomendado rodar em uma maquina linux.
+> ⚠️ Permission and network issues have been observed when using WSL. It's recommended to run on a native Linux machine.
 
 ---
 
-Para rodar os testes seguem os comandos
+## ✅ Running Tests
 
 ```bash
 sudo docker exec app_php composer install
@@ -85,7 +116,13 @@ sudo docker exec app_php php artisan test
 
 ---
 
-Outros endereços que podem ser utilizados para auxiliar no desenvolvimento com o laravel.
+## 🧪 Auxiliary Tools
 
-- [DBAdmin](http://dbadmin.localhost:8000) - Aqui dependendo da escolha do banco pode ser o **phpmyadmin** para o MySQL ou **adminer** para o PostgreSQL
-- [MailHog](http://mailhog.localhost:8000)
+- **DBAdmin**: [http://dbadmin.localhost:8000](http://dbadmin.localhost:8000) _(phpMyAdmin for MySQL or Adminer for PostgreSQL)_
+
+- **MailHog**: [http://mailhog.localhost:8000](http://mailhog.localhost:8000)
+
+---
+
+> Designed to streamline local Laravel development with Docker.  
+> Customize the .env.app as needed for your project and don't forget to mirror the changes in your project's Laravel .env
