@@ -33,6 +33,19 @@ Make sure the following software is installed:
 - [Docker](https://docs.docker.com/engine/install/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
+## Before start
+
+Clone your Laravel project into the `app` folder:
+
+```bash
+git clone <url> app
+```
+
+The `app` folder will be mounted as:
+
+- `/var/www` (for Nginx)
+- `/srv` (for Caddy)
+
 ---
 
 ## 📦 Commands to Run
@@ -63,18 +76,7 @@ sudo docker exec <container_name> <command>
 
 ## 📥 Installing Project Dependencies
 
-Clone your Laravel project into the `app` folder:
-
-```bash
-git clone <url> app
-```
-
-The `app` folder will be mounted as:
-
-- `/var/www` (for Nginx)
-- `/srv` (for Caddy)
-
-Then run:
+run:
 
 ```bash
 sudo docker exec app_php composer install --no-dev --optimize-autoloader

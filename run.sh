@@ -13,11 +13,17 @@ clear_env() {
     sudo docker system prune --all
     sudo docker volume prune --all
     echo "Environment cleared."
+    exit 0
+}
+
+usage() {
+    echo "Usage: $0 [clear | help] [caddy|nginx] [mysql|postgres] [up|down]"
+    echo "ex: $0 nginx mysql up  # this will set up the necessary services to run a nginx|mysql|phpmyadmin|redis|mailhog environment"
+    exit 0
 }
 
 if [ "$1" = "help" ]; then
-    echo "Usage: $0 [clear | help] [caddy|nginx] [mysql|postgres] [up|down]"
-    echo "ex: $0 nginx mysql up  # this will set up the necessary services to run a nginx|mysql|phpmyadmin|redis|mailhog enviroment"
+    usage
     exit 0
 fi
 
@@ -31,21 +37,27 @@ else
 
     if [ -z "$WEB_SERVER" ]; then
         echo 'You must specify the name of the web server to be utilized - caddy or nginx'
+        usage
         exit 1
     elif [ "$WEB_SERVER" = "caddy" -o "$WEB_SERVER" = "nginx" ]; then
         if [ -z "$DATABASE" ]; then
             echo 'You must specify the name of the database server to be utilized - mysql or postgres'
+            usage
             exit 1
         elif [ "$DATABASE" = "mysql" -o "$DATABASE" = "postgres" ]; then
             if [ -z "$MODE" ]; then
-                echo 'You must specify mode for the services - up or down'
+                echo 'You must specify the mode for the services - up or down'
+                usage
                 exit 1
             elif [ "$MODE" = "up" -o "$MODE" = "down" ]; then
                 if [ "$MODE" = "up" ]; then
+                    echo 'Generating the database root password file'
                     openssl rand -base64 20 > docker-data/$DATABASE/db_root_password.txt
+                    echo 'Running the docker compose up and building services'
                     sudo PWD=${PWD} WEB_SERVER="$WEB_SERVER" DATABASE="$DATABASE" docker compose --env-file .env.app up -d --build
                     exit 0
                 elif [ "$MODE" = "down" ]; then
+                    echo 'Running the docker compose down and removing services'
                     sudo PWD=${PWD} WEB_SERVER="$WEB_SERVER" DATABASE="$DATABASE" docker compose --env-file .env.app down
                     clear_env
                     exit 0

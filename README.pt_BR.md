@@ -33,6 +33,19 @@ Certifique-se de ter os seguintes softwares instalados:
 - [Docker](https://docs.docker.com/engine/install/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
+## Antes de iniciar
+
+Clone seu projeto Laravel na pasta `app`:
+
+```bash
+git clone <url> app
+```
+
+A pasta `app` será montada como:
+
+- `/var/www` (servidor Nginx)
+- `/srv` (servidor Caddy)
+
 ---
 
 ## 📦 Comandos a serem executados
@@ -62,17 +75,6 @@ sudo docker exec <nome_container> <comando>
 ---
 
 ## 📥 Instalando as dependências do projeto
-
-Clone seu projeto Laravel na pasta `app`:
-
-```bash
-git clone <url> app
-```
-
-A pasta `app` será montada como:
-
-- `/var/www` (servidor Nginx)
-- `/srv` (servidor Caddy)
 
 Execute os seguintes comandos:
 
