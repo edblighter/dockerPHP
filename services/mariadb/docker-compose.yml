@@ -1,0 +1,33 @@
+services:
+  db:
+    image: ${MARIADB_IMAGE}:${MARIADB_VERSION}
+    container_name: ${MARIADB_CONTAINER_NAME}
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD_FILE: "/run/secrets/db_root_password" # openssl rand -base64 20 | sudo docker secret create db_root_password -
+      MARIADB_DATABASE: ${APP_DATABASE_NAME}
+      MARIADB_USER: ${APP_MYSQL_USER}
+      MARIADB_PASSWORD: ${APP_MYSQL_PASSWORD}
+      MARIADB_ROOT_HOST: "%"
+      TZ: ${APP_TIMEZONE}
+    secrets:
+      - db_root_password
+    ports:
+      - ${MYSQL_PORT}:3306
+    expose:
+      - 3306
+    volumes:
+      - ${MYSQLDATA_PATH}:/var/lib/mysql
+    networks:
+      - ${APP_NETWORK_NAME}
+  dbadmin:
+    extends:
+      file: $PWD/services/phpmyadmin/docker-compose.yml
+      service: dbadmin
+secrets:
+  db_root_password:
+    file: $PWD/docker-data/mariadb/db_root_password.txt
+networks:
+  app_network:
+    name: ${APP_NETWORK_NAME}
+    driver: bridge

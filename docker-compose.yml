@@ -1,27 +1,27 @@
 services:
   app:
     extends:
-      file: $PWD/php/docker-compose.yml
+      file: $PWD/services/php/docker-compose.yml
       service: app
   db:
     extends:
-      file: $PWD/$DATABASE/docker-compose.yml
+      file: $PWD/services/$DATABASE/docker-compose.yml
       service: db
   dbadmin:
     extends:
-      file: $PWD/$DATABASE/docker-compose.yml
+      file: $PWD/services/$DATABASE/docker-compose.yml
       service: dbadmin
   redis:
     extends:
-      file: $PWD/redis/docker-compose.yml
+      file: $PWD/services/redis/docker-compose.yml
       service: redis
-  mailhog:
+  smtp:
     extends:
-      file: $PWD/mailhog/docker-compose.yml
-      service: mailhog
+      file: $PWD/services/mailpit/docker-compose.yml
+      service: smtp
   web:
     extends:
-      file: $PWD/$WEB_SERVER/docker-compose.yml
+      file: $PWD/services/$WEB_SERVER/docker-compose.yml
       service: web
 volumes:
   cache:

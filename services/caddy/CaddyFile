@@ -21,7 +21,7 @@ dbadmin.localhost {
 	reverse_proxy dbadmin:9000
 }
 
-mailhog.localhost {
+smtp.localhost {
   	tls internal
-	reverse_proxy mailhog:8025
+	reverse_proxy smtp:8025
 }

@@ -1,0 +1,24 @@
+services:
+  smtp:
+    container_name: ${APP_MAILPIT_CONTAINER}
+    restart: always
+    image: ${MAILPIT_IMAGE}:${MAILPIT_VERSION}
+    environment:
+      TZ: ${APP_TIMEZONE}
+      MP_LABEL: ${APP_MAILPIT_CONTAINER}
+      MP_MAX_MESSAGES: 0
+      MP_VERBOSE: true
+      MP_SMTP_AUTH_ACCEPT_ANY: true
+      MP_SMTP_AUTH_ALLOW_INSECURE: true
+    ports:
+      - ${APP_MAILPIT_SMTP_PORT}:1025
+      - ${APP_MAILPIT_WEB_PORT}:8025
+    networks:
+      - ${APP_NETWORK_NAME}
+    expose:
+      - 1025
+      - 8025
+networks:
+  app_network:
+    name: ${APP_NETWORK_NAME}
+    driver: bridge

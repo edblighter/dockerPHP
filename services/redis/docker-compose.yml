@@ -1,10 +1,11 @@
 services:
   redis:
-    image: redis:latest
-    container_name: ${APP_REDIS_CONTAINER}
+    image: ${REDIS_IMAGE:-redis}:${REDIS_VERSION:-latest}
+    container_name: ${REDIS_CONTAINER}
     restart: always
     environment:
       TZ: ${APP_TIMEZONE}
+      ALLOW_EMPTY_PASSWORD: yes
     ports:
       - ${APP_REDIS_PORT}:6379
     command: redis-server --save 20 1 --loglevel warning

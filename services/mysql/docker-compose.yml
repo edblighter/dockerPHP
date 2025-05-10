@@ -1,6 +1,6 @@
 services:
   db:
-    image: mysql:8
+    image: ${MYSQL_IMAGE}:${MYSQL_VERSION}
     container_name: ${MYSQL_CONTAINER_NAME}
     restart: unless-stopped
     environment:
@@ -15,33 +15,15 @@ services:
     ports:
       - ${MYSQL_PORT}:3306
     expose:
-      - ${MYSQL_PORT}
+      - 3306
     volumes:
       - ${MYSQLDATA_PATH}:/var/lib/mysql
     networks:
       - ${APP_NETWORK_NAME}
   dbadmin:
-    image: phpmyadmin:latest
-    container_name: ${PHPMYADMIN_CONTAINER_NAME}
-    restart: always
-    depends_on:
-      - db
-    environment:
-      PMA_ABSOLUTE_URI: ${PHPMYADMIN_URL}
-      PMA_HOST: db
-      PMA_USER: ${APP_MYSQL_USER}
-      PMA_PASSWORD: ${APP_MYSQL_PASSWORD}
-      UPLOAD_LIMIT: 100M
-      MEMORY_LIMIT: 2G
-      MAX_EXECUTION_TIME: 600
-      PMA_PORT: ${MYSQL_PORT}
-      TZ: ${APP_TIMEZONE}
-    ports:
-      - 9000:80
-    expose:
-      - 80
-    networks:
-      - ${APP_NETWORK_NAME}
+    extends:
+      file: $PWD/services/phpmyadmin/docker-compose.yml
+      service: dbadmin
 secrets:
   db_root_password:
     file: $PWD/docker-data/mysql/db_root_password.txt
