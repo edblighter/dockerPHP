@@ -1,0 +1,72 @@
+# This image is intended to be a complete build 
+# with mysql,postgres and sqlite drivers
+FROM php:5.6-fpm
+
+RUN set -eux; \
+    sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list; \
+    sed -i 's|security.debian.org|archive.debian.org|g' /etc/apt/sources.list; \
+    sed -i '/stretch-updates/d' /etc/apt/sources.list; \
+    mkdir -p /usr/share/man/man1/; \
+    mkdir -p /usr/share/man/man7/
+# Install dependencies
+RUN set -eux; \
+    apt-get update; \
+    apt-get upgrade -y; \
+    apt-get install -y --no-install-recommends \
+        git \
+        curl \
+        libmcrypt-dev \
+        libmemcached-dev \
+        libcurl4-gnutls-dev \
+        libz-dev \
+        libpq-dev \
+        libjpeg-dev \
+        libpng-dev \
+        libfreetype6-dev \
+        libssl-dev \
+        libwebp-dev \
+        libxpm-dev \
+        libmcrypt-dev \
+        libonig-dev \
+        libxml2-dev \
+        libsqlite3-dev \
+        sqlite3 \
+        libzip-dev \
+        zip \
+        unzip \
+        default-mysql-client \
+        postgresql-client; \
+    apt-get autoclean; \
+    apt-get autoremove -y; \
+    rm -rf /var/lib/apt/lists/*
+
+RUN set -eux; \  
+    docker-php-ext-install pdo_mysql \
+        pdo_pgsql \
+        pdo_sqlite \
+        mbstring \
+        exif \
+        pcntl \
+        bcmath \
+        zip \
+        xml \
+        pgsql \
+        mcrypt \
+        intl \
+        curl; \
+    docker-php-ext-configure gd \
+    --prefix=/usr \
+    --with-jpeg \
+    --with-freetype; \
+    docker-php-ext-install gd; 
+
+RUN usermod -u 1000 www-data
+
+# Install Composer
+COPY --from=composer:lts /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www
+
+RUN chmod 755 -R /var/www
+
+CMD ["php-fpm"]

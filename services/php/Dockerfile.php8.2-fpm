@@ -1,6 +1,6 @@
 # This image is intended to be a complete build 
 # with mysql,postgres and sqlite drivers
-FROM php:8.3-fpm
+FROM php:8.2-fpm
 
 # Install dependencies
 RUN set -eux; \

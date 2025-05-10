@@ -13,12 +13,13 @@ services:
       UPLOAD_LIMIT: 100M
       MEMORY_LIMIT: 2G
       MAX_EXECUTION_TIME: 600
+      APACHE_PORT: 9000
       PMA_PORT: ${MYSQL_PORT}
       TZ: ${APP_TIMEZONE}
     ports:
-      - 9000:80
+      - 9000:9000
     expose:
-      - 80
+      - 9000
     networks:
       - ${APP_NETWORK_NAME}
 networks:

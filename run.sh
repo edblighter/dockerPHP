@@ -4,11 +4,42 @@
 
 clear_env() {
     echo "Clearing environment..."
-    sudo rm -rf docker-data/caddy/config docker-data/caddy/data docker-data/mysql/mysqldata docker-data/postgres/data docker-data/postgres/db_root_password.txt docker-data/mysql/db_root_password.txt
-    sudo docker stop app_php app_mysql app_postgres app_redis app_phpmyadmin app_dbadmin app_nginx app_caddy app_mailhog
-    sudo docker rm app_php app_mysql app_postgres app_redis app_phpmyadmin app_dbadmin app_nginx app_caddy app_mailhog
-    sudo docker volume rm redis_cache
-    sudo docker network rm app_network
+    sudo rm -rf \
+        docker-data/caddy/config \
+        docker-data/caddy/data \
+        docker-data/mysql/mysqldata \
+        docker-data/postgres/data \
+        docker-data/postgres/db_root_password.txt \
+        docker-data/mysql/db_root_password.txt \
+        docker-data/mariadb/db_root_password.txt
+    sudo docker stop \
+        app_php \
+        app_mysql \
+        app_postgres \
+        app_redis \
+        app_phpmyadmin \
+        app_dbadmin \
+        app_nginx \
+        app_caddy \
+        app_mailpit \
+        app_mariadb
+    sudo docker rm \
+        app_php \
+        app_mysql \
+        app_postgres \
+        app_redis \
+        app_phpmyadmin \
+        app_dbadmin \
+        app_nginx \
+        app_caddy \
+        app_mailpit \
+        app_mariadb
+    sudo docker volume rm \
+        redis_cache \
+        app_volume
+    sudo docker network rm \
+        app_network
+
     echo "##### ATTENTION the following commands will erase all stopped docker containers and associated volumes. Say NO if you don't know what to do. ###"
     sudo docker system prune --all
     sudo docker volume prune --all
@@ -17,8 +48,8 @@ clear_env() {
 }
 
 usage() {
-    echo "Usage: $0 [clear | help] [caddy|nginx] [mysql|postgres] [up|down]"
-    echo "ex: $0 nginx mysql up  # this will set up the necessary services to run a nginx|mysql|phpmyadmin|redis|mailhog environment"
+    echo "Usage: $0 [clear | help] [caddy|nginx] [mysql|mariadb|postgres] [up|down]"
+    echo "ex: $0 nginx mysql up  # this will set up the necessary services to run a nginx|mysql|phpmyadmin|redis|mailpit environment"
     exit 0
 }
 
@@ -41,10 +72,10 @@ else
         exit 1
     elif [ "$WEB_SERVER" = "caddy" -o "$WEB_SERVER" = "nginx" ]; then
         if [ -z "$DATABASE" ]; then
-            echo 'You must specify the name of the database server to be utilized - mysql or postgres'
+            echo 'You must specify the name of the database server to be utilized - mysql or mariadb or postgres'
             usage
             exit 1
-        elif [ "$DATABASE" = "mysql" -o "$DATABASE" = "postgres" ]; then
+        elif [ "$DATABASE" = "mysql" -o "$DATABASE" = "mariadb" -o "$DATABASE" = "postgres" ]; then
             if [ -z "$MODE" ]; then
                 echo 'You must specify the mode for the services - up or down'
                 usage

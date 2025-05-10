@@ -1,7 +1,7 @@
 # CONTAINERS NAME
 APP_CONTAINER_NAME=app_php  # Container running the php-fpm(Default port 9000)
 MYSQL_CONTAINER_NAME=app_mysql  # Container running the MySQL intance(Default port 3306 - Change at MYSQL_PORT variable)
-MARIADB_CONTAINER_NAME=app_  # Container running the MariaDB intance(Default port 3306 - Change at MYSQL_PORT variable)
+MARIADB_CONTAINER_NAME=app_mariadb  # Container running the MariaDB intance(Default port 3306 - Change at MYSQL_PORT variable)
 PHPMYADMIN_CONTAINER_NAME=app_phpmyadmin    # Container running the phpmyadmin to administer the MySQL/MariaDB when selected(Default address http://dbadmin.localhost:8000)
 POSTGRES_CONTAINER_NAME=app_postgres    # Container running the PostgreSQL intance(Default port 5432 - Change at POSTGRES_PORT)
 DBADMIN_CONTAINER_NAME=app_dbadmin  # Container running the Adminer instance used the administer the PostgreSQL when selected(Default address http://dbadmin.localhost:8000)
@@ -27,11 +27,14 @@ APP_NETWORK_NAME=app_network    # Default docker network name used between servi
 # COMMON DATABASE NAME
 APP_DATABASE_NAME=laravel   # Database created at start of the database containers
 
+# PHP ENV
+PHP_VERSION=8.3        # Supported Versions [8.3, 8.2, 8.1, 7.4, 5.6]
+
 # MYSQL ENV
 MYSQL_IMAGE=mysql
-MYSQL_VERSION=8-bookworm      # RECOMMENDED TAGS[latest, lts, 8.0-bookworm]
+MYSQL_VERSION=lts      # RECOMMENDED TAGS[latest, lts, 5.7]
 MARIADB_IMAGE=mariadb
-MARIADB_VESION=lts      # RECOMMENDED TAGS[latest, lts, 10]
+MARIADB_VERSION=lts      # RECOMMENDED TAGS[latest, lts, 10]
 
 APP_MYSQL_USER=laravel
 APP_MYSQL_PASSWORD=secret
