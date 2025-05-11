@@ -1,5 +1,7 @@
 # This image is intended to be a complete build 
 # with mysql,postgres and sqlite drivers
+FROM oven/bun:latest AS bun
+
 FROM php:8.3-fpm
 
 # Install dependencies
@@ -34,6 +36,7 @@ RUN set -eux; \
     apt-get autoremove -y; \
     rm -rf /var/lib/apt/lists/*
 
+# INSTALL PHP MODULES
 RUN set -eux; \  
     docker-php-ext-install pdo_mysql \
         pdo_pgsql \
@@ -61,9 +64,11 @@ RUN usermod -u 1000 www-data
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www
+COPY --from=bun /usr/local/bin/bun /usr/local/bin
 
 RUN chmod 755 -R /var/www
+
+WORKDIR /var/www
 
 CMD ["php-fpm"]
 
