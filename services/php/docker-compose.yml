@@ -2,7 +2,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: $PWD/services/php/Dockerfile.php${PHP_VERSION}-fpm
+      dockerfile: $PWD/services/php/versions/Dockerfile.php${PHP_VERSION}-fpm
     container_name: ${APP_CONTAINER_NAME}
     user: 1000:1000
     working_dir: /var/www
@@ -12,6 +12,8 @@ services:
       TZ: ${APP_TIMEZONE}
     networks:
       - ${APP_NETWORK_NAME}
+    expose:
+      - 9000
 volumes:
   app_volume:
     name: app_volume
