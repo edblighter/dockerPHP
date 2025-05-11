@@ -1,0 +1,7 @@
+log {
+        # output logs to standard error (console)
+        output stderr
+    }
+import sites/*
+
+

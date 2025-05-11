@@ -4,8 +4,11 @@ services:
     container_name: ${APP_CADDY_CONTAINER_NAME}
     restart: unless-stopped
     volumes:
-      - $PWD/services/caddy/CaddyFile:/etc/caddy/Caddyfile:ro
-      - $PWD/services/caddy/security.conf:/etc/caddy/security
+      - $PWD/services/caddy/conf/CaddyFile:/etc/caddy/Caddyfile:ro
+      - $PWD/services/caddy/services/:/etc/caddy/services/
+      - $PWD/services/caddy/sites/:/etc/caddy/sites/
+      - $PWD/services/caddy/snippets/:/etc/caddy/snippets/
+      - $PWD/services/caddy/conf/security.conf:/etc/caddy/security
       - app_volume:/srv
       - $PWD/docker-data/caddy/data:/data
       - $PWD/docker-data/caddy/config:/config

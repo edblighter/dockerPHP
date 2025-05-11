@@ -82,6 +82,8 @@ else
                 exit 1
             elif [ "$MODE" = "up" -o "$MODE" = "down" ]; then
                 if [ "$MODE" = "up" ]; then
+                    echo "Creating minimal data folders"
+                    mkdir -p docker-data/php docker-data/$DATABASE docker-data/$WEB_SERVER
                     echo 'Generating the database root password file'
                     openssl rand -base64 20 > docker-data/$DATABASE/db_root_password.txt
                     echo 'Running the docker compose up and building services'

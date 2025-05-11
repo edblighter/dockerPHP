@@ -1,12 +1,10 @@
-app.localhost {
+info.localhost {
     tls internal
     log {
         # output logs to standard error (console)
         output stderr
     }
-
     root * /srv/public
-
     encode zstd gzip
     import ./security
     # Or serve a PHP site through php-fpm:
@@ -14,14 +12,4 @@ app.localhost {
         root /var/www/public
     }
     file_server
-}
-
-dbadmin.localhost {
-  	tls internal
-	reverse_proxy dbadmin:9000
-}
-
-smtp.localhost {
-  	tls internal
-	reverse_proxy smtp:8025
 }

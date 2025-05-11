@@ -1,0 +1,4 @@
+smtp.localhost {
+  	tls internal
+	reverse_proxy smtp:8025
+}
