@@ -5,11 +5,7 @@ info.localhost {
         output stderr
     }
     root * /srv/public
-    encode zstd gzip
-    import ./security
-    # Or serve a PHP site through php-fpm:
     php_fastcgi app:9000 {
         root /var/www/public
     }
-    file_server
 }
