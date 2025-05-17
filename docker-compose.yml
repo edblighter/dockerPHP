@@ -3,6 +3,12 @@ services:
     extends:
       file: $PWD/services/php/docker-compose.yml
       service: app
+  web:
+    extends:
+      file: $PWD/services/$WEB_SERVER/docker-compose.yml
+      service: web
+    depends_on:
+      - app
   db:
     extends:
       file: $PWD/services/$DATABASE/docker-compose.yml
@@ -19,10 +25,6 @@ services:
     extends:
       file: $PWD/services/mailpit/docker-compose.yml
       service: smtp
-  web:
-    extends:
-      file: $PWD/services/$WEB_SERVER/docker-compose.yml
-      service: web
 volumes:
   cache:
     name: redis_cache

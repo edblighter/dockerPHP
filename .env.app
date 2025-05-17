@@ -11,7 +11,8 @@ APP_NGINX_CONTAINER_NAME=app_nginx  # Container running the Caddy web server (De
 APP_CADDY_CONTAINER_NAME=app_caddy  # Container running the Nginx web server (Default to HTTP_PORT = 8000)
 
 # MAPPED PORTS
-APP_HTTP_PORT=8000 # Default port to be used for http access(if you port 80 is free consider changing)
+APP_HTTP_PORT=8000 # Default port to be used for http access(if your port 80 is free consider changing)
+APP_HTTPS_PORT=443 # Default port to be used for https access(if your port 443 is free consider changing)
 MYSQL_PORT=3306     # Default mysql/mariadb port
 POSTGRES_PORT=5432  # Default postgresql port
 APP_REDIS_PORT=6379 # Defaul redis port

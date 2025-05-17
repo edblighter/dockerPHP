@@ -1,3 +1,19 @@
+# ENV variables for this service.
+# The content is available in .env.caddy with default values
+#
+# CADDY_IMAGE - The base image name for use. Default is caddy .
+# CADDY_VERSION - The version tag for use. Default is alpine . RECOMMENDED TAGS[latest, alpine]
+# APP_CADDY_CONTAINER_NAME - The container name
+# APP_TIMEZONE - The user Timezone.
+# APP_NETWORK_NAME - The network name of the docker services to be used.
+# APP_HTTP_PORT - The http host port.
+# APP_HTTPS_PORT - The https host port.
+# PWD - The context directory(usualy the root path of the cloned project)
+#
+# You can start this service using the following command at the root of the cloned project:
+#
+# sudo PWD=${PWD} docker compose --env-file services/caddy/.env.caddy -f services/caddy/docker-compose.yml up -d
+#
 services:
   web:
     image: ${CADDY_IMAGE}:${CADDY_VERSION}
@@ -16,14 +32,12 @@ services:
       - ${APP_NETWORK_NAME}
     cap_add:
       - NET_ADMIN
-    depends_on:
-      - app
     environment:
       TZ: ${APP_TIMEZONE}
     ports:
       - "${APP_HTTP_PORT}:80"
-      - "443:443"
-      - "443:443/udp"
+      - "${APP_HTTPS_PORT}:443"
+      - "${APP_HTTPS_PORT}:443/udp"
     expose:
       - 80 # http
       - 443 # https

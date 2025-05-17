@@ -1,11 +1,16 @@
 info.localhost {
     tls internal
+
     log {
         # output logs to standard error (console)
         output stderr
     }
+
     root * /srv/public
+
     php_fastcgi app:9000 {
         root /var/www/public
     }
+
+    file_server
 }
