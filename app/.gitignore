@@ -3,3 +3,6 @@ app
 .bash_history
 .composer
 .mysql_history
+.cache
+.gitconfig
+.vscode-server

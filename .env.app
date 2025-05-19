@@ -29,7 +29,7 @@ APP_NETWORK_NAME=app_network    # Default docker network name used between servi
 APP_DATABASE_NAME=laravel   # Database created at start of the database containers
 
 # PHP ENV
-PHP_VERSION=8.3        # Supported Versions [8.3, 8.2, 8.1, 7.4, 5.6]
+PHP_VERSION=8.4        # Supported Versions [8.4, 8.3, 8.2, 7.4, 5.6]
 
 # MYSQL ENV
 MYSQL_IMAGE=mysql

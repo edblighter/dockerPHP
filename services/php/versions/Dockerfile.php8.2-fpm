@@ -1,5 +1,7 @@
 # This image is intended to be a complete build 
 # with mysql,postgres and sqlite drivers
+FROM oven/bun:latest AS bun
+
 FROM php:8.2-fpm
 
 # Install dependencies
@@ -60,6 +62,7 @@ RUN usermod -u 1000 www-data
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=bun /usr/local/bin/bun /usr/local/bin
 
 WORKDIR /var/www
 

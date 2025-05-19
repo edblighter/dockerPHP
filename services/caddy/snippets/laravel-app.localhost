@@ -1,7 +1,7 @@
 # snippets/laravel-app
 # {args.0} represents the root url and foldername of the app. 
 
-(laravel-app) {
+(laravel-app.localhost) {
     {args.0}.localhost {
         tls internal
         log {
