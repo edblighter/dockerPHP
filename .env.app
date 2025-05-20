@@ -7,8 +7,8 @@ POSTGRES_CONTAINER_NAME=app_postgres    # Container running the PostgreSQL intan
 DBADMIN_CONTAINER_NAME=app_dbadmin  # Container running the Adminer instance used the administer the PostgreSQL when selected(Default address http://dbadmin.localhost:8000)
 APP_MAILPIT_CONTAINER=app_mailpit   # Container running the Mailpit instance to simulate SMTP sends (Default address http://smtp.localhost:8000)
 REDIS_CONTAINER=app_redis   # Container running the Redis instance (Default port 6379 - Change at APP_REDIS_PORT variable)
-APP_NGINX_CONTAINER_NAME=app_nginx  # Container running the Caddy web server (Default to HTTP_PORT = 8000 and HTTPS available)
-APP_CADDY_CONTAINER_NAME=app_caddy  # Container running the Nginx web server (Default to HTTP_PORT = 8000)
+APP_NGINX_CONTAINER_NAME=app_nginx  # Container running the Nginx web server (Default to HTTP_PORT = 8000)
+APP_CADDY_CONTAINER_NAME=app_caddy  # Container running the Caddy web server (Default to HTTP_PORT = 8000 and HTTPS available)
 
 # MAPPED PORTS
 APP_HTTP_PORT=8000 # Default port to be used for http access(if your port 80 is free consider changing)

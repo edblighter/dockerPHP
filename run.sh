@@ -92,7 +92,7 @@ else
                 elif [ "$MODE" = "down" ]; then
                     echo 'Running the docker compose down and removing services'
                     sudo PWD=${PWD} WEB_SERVER="$WEB_SERVER" DATABASE="$DATABASE" docker compose --env-file .env.app down
-                    clear_env
+                    #clear_env
                     exit 0
                 fi
             fi

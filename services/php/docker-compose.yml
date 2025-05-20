@@ -15,7 +15,7 @@ services:
     networks:
       - ${APP_NETWORK_NAME}
     expose:
-      - 9000
+      - 9000 # The PHP service runs only in the internal app_network at the 9000
 volumes:
   app_volume:
     name: app_volume

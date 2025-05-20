@@ -2,7 +2,12 @@ services:
   db:
     image: ${MYSQL_IMAGE}:${MYSQL_VERSION}
     container_name: ${MYSQL_CONTAINER_NAME}
-    restart: unless-stopped
+    restart: always
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 --password="$$(cat /run/secrets/db-db_root_password)" --silent']
+      interval: 3s
+      retries: 5
+      start_period: 30s
     environment:
       MYSQL_ROOT_PASSWORD_FILE: "/run/secrets/db_root_password" # openssl rand -base64 20 | sudo docker secret create db_root_password -
       MYSQL_DATABASE: ${APP_DATABASE_NAME}
