@@ -2,7 +2,14 @@ services:
   db:
     image: ${MARIADB_IMAGE}:${MARIADB_VERSION}
     container_name: ${MARIADB_CONTAINER_NAME}
-    restart: unless-stopped
+    restart: always
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 --password="$$(cat /run/secrets/db_root_password)" --silent']
+      #test: ["CMD", "mysql", "-u", "root", -p$$(cat /run/secrets/db_root_password), "--execute", "SHOW DATABASES;"] # Alternative healthcheck
+      interval: 5s
+      timeout: 3s
+      retries: 2
+      start_period: 0s
     environment:
       MARIADB_ROOT_PASSWORD_FILE: "/run/secrets/db_root_password" # openssl rand -base64 20 | sudo docker secret create db_root_password -
       MARIADB_DATABASE: ${APP_DATABASE_NAME}
@@ -17,7 +24,8 @@ services:
     expose:
       - 3306
     volumes:
-      - ${MYSQLDATA_PATH}:/var/lib/mysql
+      - ${MARIADBDATA_PATH}:/var/lib/mysql
+      - $PWD/services/mariadb/conf/50-server.cnf:/etc/mysql/mariadb.conf.d/50-server.cnf
     networks:
       - ${APP_NETWORK_NAME}
   dbadmin:

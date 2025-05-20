@@ -9,9 +9,11 @@ clear_env() {
         docker-data/caddy/data \
         docker-data/mysql/mysqldata \
         docker-data/postgres/data \
+        docker-data/nginx/logs \
         docker-data/postgres/db_root_password.txt \
         docker-data/mysql/db_root_password.txt \
         docker-data/mariadb/db_root_password.txt
+
     sudo docker stop \
         app_php \
         app_mysql \

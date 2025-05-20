@@ -40,6 +40,7 @@ MARIADB_VERSION=lts      # RECOMMENDED TAGS[latest, lts, 10]
 APP_MYSQL_USER=laravel
 APP_MYSQL_PASSWORD=secret
 MYSQLDATA_PATH="$PWD/docker-data/mysql/mysqldata"
+MARIADBDATA_PATH="$PWD/docker-data/mariadb/mysqldata"
 
 # PHPMYADMIN
 PHPMYADMIN_IMAGE=phpmyadmin     # RECOMMENDED IMAGE [phpmyadmin, phpmyadmin/phpmyadmin]

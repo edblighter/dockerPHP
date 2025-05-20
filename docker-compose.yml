@@ -3,6 +3,8 @@ services:
     extends:
       file: $PWD/services/php/docker-compose.yml
       service: app
+    depends_on:
+      - db
   web:
     extends:
       file: $PWD/services/$WEB_SERVER/docker-compose.yml
@@ -17,6 +19,8 @@ services:
     extends:
       file: $PWD/services/$DATABASE/docker-compose.yml
       service: dbadmin
+    depends_on:
+      - db
   redis:
     extends:
       file: $PWD/services/redis/docker-compose.yml
