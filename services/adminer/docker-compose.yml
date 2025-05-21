@@ -1,0 +1,17 @@
+services:
+  dbadmin:
+    image: ${ADMINER_IMAGE}:${ADMINER_VERSION}
+    container_name: ${DBADMIN_CONTAINER_NAME}
+    restart: always
+    environment:
+      ADMINER_DEFAULT_DB_DRIVER: ${ADMINER_DEFAULT_DRIVER}
+      ADMINER_DEFAULT_DB_HOST: ${DB_HOST}
+      ADMINER_DEFAULT_DB_NAME: ${APP_DATABASE_NAME}
+    expose:
+      - 9000
+    networks:
+      - ${APP_NETWORK_NAME}
+networks:
+  app_network:
+    name: ${APP_NETWORK_NAME}
+    driver: bridge

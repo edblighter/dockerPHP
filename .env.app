@@ -10,6 +10,12 @@ REDIS_CONTAINER=app_redis   # Container running the Redis instance (Default port
 APP_NGINX_CONTAINER_NAME=app_nginx  # Container running the Nginx web server (Default to HTTP_PORT = 8000)
 APP_CADDY_CONTAINER_NAME=app_caddy  # Container running the Caddy web server (Default to HTTP_PORT = 8000 and HTTPS available)
 
+# HOST LIST
+DB_HOST=db
+APP_HOST=app
+SMTP_HOST=smtp
+REDIS_HOST=redis
+
 # MAPPED PORTS
 APP_HTTP_PORT=8000 # Default port to be used for http access(if your port 80 is free consider changing)
 APP_HTTPS_PORT=443 # Default port to be used for https access(if your port 443 is free consider changing)
@@ -46,6 +52,7 @@ MARIADBDATA_PATH="$PWD/docker-data/mariadb/mysqldata"
 PHPMYADMIN_IMAGE=phpmyadmin     # RECOMMENDED IMAGE [phpmyadmin, phpmyadmin/phpmyadmin]
 PHPMYADMIN_VERSION=latest   # RECOMMENDED TAGS[latest, fpm-alpine]
 PHPMYADMIN_URL="http://dbadmin.localhost/"
+PHPMYADMIN_ARBITRARY=0      # If this value is 1 then the system will ask for the credentials
 
 # POSTGRES ENV
 POSTGRES_IMAGE=postgres
@@ -57,7 +64,7 @@ POSTGRESDATA_PATH="$PWD/docker-data/postgres/data"
 # DBADMIN
 ADMINER_IMAGE=wodby/adminer
 ADMINER_VERSION=latest    # RECOMMENDED TAGS[latest, 5, 5-4.2.1]
-
+ADMINER_DEFAULT_DRIVER=pgsql
 # REDIS ENV
 REDIS_IMAGE=redis      
 REDIS_VERSION=alpine    # RECOMMENDED TAGS[latest, alpine,  8-bookworm, 8-alpine]

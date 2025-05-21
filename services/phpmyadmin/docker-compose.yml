@@ -3,11 +3,9 @@ services:
     image: ${PHPMYADMIN_IMAGE}:${PHPMYADMIN_VERSION}
     container_name: ${PHPMYADMIN_CONTAINER_NAME}
     restart: always
-    depends_on:
-      - db
     environment:
       PMA_ABSOLUTE_URI: ${PHPMYADMIN_URL}
-      PMA_HOST: db
+      PMA_HOST: ${DB_HOST}
       PMA_USER: ${APP_MYSQL_USER}
       PMA_PASSWORD: ${APP_MYSQL_PASSWORD}
       UPLOAD_LIMIT: 100M
@@ -15,6 +13,7 @@ services:
       MAX_EXECUTION_TIME: 600
       APACHE_PORT: 9000
       PMA_PORT: ${MYSQL_PORT}
+      PMA_ARBITRARY: ${PHPMYADMIN_ARBITRARY}
       TZ: ${APP_TIMEZONE}
     ports:
       - 9000:9000

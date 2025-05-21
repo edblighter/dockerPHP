@@ -20,17 +20,11 @@ services:
     networks:
       - ${APP_NETWORK_NAME}
   dbadmin:
-    image: ${ADMINER_IMAGE}:${ADMINER_VERSION}
-    container_name: ${DBADMIN_CONTAINER_NAME}
-    restart: always
-    environment:
-      ADMINER_DEFAULT_DB_DRIVER: pgsql
-      ADMINER_DEFAULT_DB_HOST: db
-      ADMINER_DEFAULT_DB_NAME: ${APP_DATABASE_NAME}
-    expose:
-      - 9000
-    networks:
-      - ${APP_NETWORK_NAME}
+    extends:
+      file: $PWD/services/adminer/docker-compose.yml
+      service: dbadmin
+    depends_on:
+      - db
 secrets:
   db_root_password:
     file: $PWD/docker-data/postgres/db_root_password.txt
