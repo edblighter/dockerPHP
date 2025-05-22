@@ -9,6 +9,7 @@ clear_env() {
         docker-data/caddy/data \
         docker-data/mysql/mysqldata \
         docker-data/postgres/data \
+        docker-data/postgres/logs \
         docker-data/nginx/logs \
         docker-data/postgres/db_root_password.txt \
         docker-data/mysql/db_root_password.txt \
@@ -86,6 +87,13 @@ else
                 if [ "$MODE" = "up" ]; then
                     echo "Creating minimal data folders"
                     mkdir -p docker-data/php docker-data/$DATABASE docker-data/$WEB_SERVER
+                    if [ "$DATABASE" = "postgres" ]; then
+                        echo "Adjusting permissions for the postgres log folder"
+                        mkdir -p docker-data/$DATABASE/logs
+                        sudo chown :70 docker-data/$DATABASE/logs
+                        sudo chmod 770 docker-data/$DATABASE/logs
+                        sudo chmod g+s docker-data/$DATABASE/logs
+                    fi
                     echo 'Generating the database root password file'
                     openssl rand -base64 20 > docker-data/$DATABASE/db_root_password.txt
                     echo 'Running the docker compose up and building services'

@@ -2,7 +2,13 @@ services:
   db:
     image: ${POSTGRES_IMAGE}:${POSTGRES_VERSION}
     container_name: ${POSTGRES_CONTAINER_NAME}
-    restart: unless-stopped
+    command: -c config_file=/etc/postgresql.conf
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${APP_POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     environment:
       #POSTGRES_PASSWORD_FILE: /run/secrets/db_root_password # openssl rand -base64 20 | sudo docker secret create db_root_password -
       POSTGRES_DB: ${APP_DATABASE_NAME}
@@ -17,6 +23,8 @@ services:
       - 5432
     volumes:
       - ${POSTGRESDATA_PATH}:/var/lib/postgresql/data
+      - $PWD/services/postgres/conf/postgresql.conf:/etc/postgresql.conf
+      #- $PWD/docker-data/postgres/logs:/tmp/logs
     networks:
       - ${APP_NETWORK_NAME}
   dbadmin:
