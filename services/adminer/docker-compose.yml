@@ -1,7 +1,13 @@
 # Container running the Adminer instance used to manage the PostgreSQL when selected.
 # Default address via proxy http://dbadmin.localhost:8000 
 # or
-# Default address for standalone service http://127.0.0.1:8088 
+# Default address for standalone service http://127.0.0.1:8088
+#
+# You can spin a standalone version with the default variables or using the .env.adminer in this folder for custom values.
+# Ex: docker composer -f services/adminer/docker-compose.yml up -d
+# or using the .env.adminer
+# docker composer -f services/adminer/docker-compose.yml --env-file services/adminer/.env.adminer up -d
+#
 services:
   dbadmin:
     image: ${ADMINER_IMAGE:-wodby/adminer}:${ADMINER_VERSION:-latest}

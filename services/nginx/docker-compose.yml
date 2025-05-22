@@ -1,7 +1,21 @@
+# Container to run the Nginx web server and proxy.
+# Note: The volumes at this container are refered at the root folder of the project.
+# Run the service at the root folder using the -f flag for the default values. 
+# Ex: docker compose -f services/nginx/docker-compose.yml up -d
+# or
+# docker compose -f services/nginx/docker-compose.yml --env-file services/nginx/.env.nginx up -d
+# to spin up the container with custom values.
+#
+# Default HTTP_PORT is 8000 and can be changed with the env variables at services/nginx/.env.nginx 
+#
+# You can create the vhosts at conf/sites-enabled folder using the Nginx conf server directive.
+#
+# Default services for this project can be found at conf/conf.d folder.
+#
 services:
   web:
-    image: ${NGINX_IMAGE:-nginx}:${NGINX_VERSION}
-    container_name: ${APP_NGINX_CONTAINER_NAME}
+    image: ${NGINX_IMAGE:-nginx}:${NGINX_VERSION:alpine}
+    container_name: ${APP_NGINX_CONTAINER_NAME:-app_nginx}
     volumes:
       - app_volume:/var/www
       - $PWD/services/nginx/conf/conf.d:/etc/nginx/conf.d
@@ -9,11 +23,11 @@ services:
       - $PWD/services/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
       - $PWD/docker-data/nginx/logs:/var/log/nginx/
     networks:
-      - ${APP_NETWORK_NAME}
+      - ${APP_NETWORK_NAME:-app_network}
     environment:
-      TZ: ${APP_TIMEZONE}
+      TZ: ${APP_TIMEZONE:-America/Sao_Paulo}
     ports:
-      - "${APP_HTTP_PORT}:80"
+      - "${APP_HTTP_PORT:-8000}:80"
     expose:
       - 80
 volumes:
@@ -25,5 +39,5 @@ volumes:
       device: $PWD/app
 networks:
   app_network:
-    name: ${APP_NETWORK_NAME}
+    name: ${APP_NETWORK_NAME:-app_network}
     driver: bridge

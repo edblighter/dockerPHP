@@ -1,7 +1,20 @@
+# Container running the MySQL
+# Note: The volumes at this container are refered at the root folder of the project.
+# Befor running this service run the command at the root folder:
+# openssl rand -base64 20 > docker-data/mysql/db_root_password.txt
+# Run the service at the root folder using the -f flag. 
+# Ex: docker compose -f services/mysql/docker-compose.yml --env-file services/mysql/.env.mysql up -d
+#
+# Default host port is 3306 and can be changed with the env variables.
+# This service runs with PHPMyAdmin for easy management of the database.
+# The PHPMyAdmin default address is http://127.0.0.1:9000 if used standalone
+# or
+# Via proxy http://dbadmin.localhost:8000 
+#
 services:
   db:
-    image: ${MYSQL_IMAGE}:${MYSQL_VERSION}
-    container_name: ${MYSQL_CONTAINER_NAME}
+    image: ${MYSQL_IMAGE:-mysql}:${MYSQL_VERSION:-lts}
+    container_name: ${MYSQL_CONTAINER_NAME:-app_mysql}
     restart: always
     healthcheck:
       test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 --password="$$(cat /run/secrets/db_root_password)" --silent']
@@ -12,30 +25,32 @@ services:
       start_period: 0s
     environment:
       MYSQL_ROOT_PASSWORD_FILE: "/run/secrets/db_root_password" # openssl rand -base64 20 | sudo docker secret create db_root_password -
-      MYSQL_DATABASE: ${APP_DATABASE_NAME}
-      MYSQL_USER: ${APP_MYSQL_USER}
-      MYSQL_PASSWORD: ${APP_MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${APP_DATABASE_NAME:-app}
+      MYSQL_USER: ${APP_MYSQL_USER:-app}
+      MYSQL_PASSWORD: ${APP_MYSQL_PASSWORD:-secret}
       MYSQL_ROOT_HOST: "%"
-      TZ: ${APP_TIMEZONE}
+      TZ: ${APP_TIMEZONE:-America/Sao_Paulo}
     secrets:
       - db_root_password
     ports:
-      - ${MYSQL_PORT}:3306
+      - ${MYSQL_PORT:-3306}:3306
     expose:
       - 3306
     volumes:
-      - ${MYSQLDATA_PATH}:/var/lib/mysql
+      - ${MYSQLDATA_PATH:-/tmp/mysql}:/var/lib/mysql
       - $PWD/services/mysql/conf/my.cnf:/etc/my.cnf
     networks:
-      - ${APP_NETWORK_NAME}
+      - ${APP_NETWORK_NAME:-app_network}
   dbadmin:
     extends:
       file: $PWD/services/phpmyadmin/docker-compose.yml
       service: dbadmin
+    depends_on:
+      - db
 secrets:
   db_root_password:
     file: $PWD/docker-data/mysql/db_root_password.txt
 networks:
   app_network:
-    name: ${APP_NETWORK_NAME}
+    name: ${APP_NETWORK_NAME:-app_network}
     driver: bridge
