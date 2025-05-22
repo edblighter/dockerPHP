@@ -1,17 +1,29 @@
+# Container running the Adminer instance used to manage the PostgreSQL when selected.
+# Default address via proxy http://dbadmin.localhost:8000 
+# or
+# Default address for standalone service http://127.0.0.1:8088 
 services:
   dbadmin:
-    image: ${ADMINER_IMAGE}:${ADMINER_VERSION}
-    container_name: ${DBADMIN_CONTAINER_NAME}
+    image: ${ADMINER_IMAGE:-wodby/adminer}:${ADMINER_VERSION:-latest}
+    container_name: ${DBADMIN_CONTAINER_NAME:-app_dbadmin}
     restart: always
+    healthcheck:
+      test: wget --no-verbose --tries=1 --output-document=/dev/null http://127.0.0.1:9000 &> /dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 2
+      start_period: 0s
     environment:
-      ADMINER_DEFAULT_DB_DRIVER: ${ADMINER_DEFAULT_DRIVER}
-      ADMINER_DEFAULT_DB_HOST: ${DB_HOST}
-      ADMINER_DEFAULT_DB_NAME: ${APP_DATABASE_NAME}
+      ADMINER_DEFAULT_DB_DRIVER: ${ADMINER_DEFAULT_DRIVER:-pgsql}
+      ADMINER_DEFAULT_DB_HOST: ${DB_HOST:-db}
+      ADMINER_DEFAULT_DB_NAME: ${APP_DATABASE_NAME:-app}
+    ports:
+      - ${ADMINER_EXTERNAL_PORT:-8088}:9000   # Port 8088 will be used to access the system without proxy.
     expose:
       - 9000
     networks:
-      - ${APP_NETWORK_NAME}
+      - ${APP_NETWORK_NAME:-app_network}
 networks:
   app_network:
-    name: ${APP_NETWORK_NAME}
+    name: ${APP_NETWORK_NAME:-app_network}
     driver: bridge

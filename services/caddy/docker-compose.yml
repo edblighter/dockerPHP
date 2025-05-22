@@ -1,24 +1,23 @@
-# ENV variables for this service.
-# The content is available in .env.caddy with default values
+# Container to run the Caddy web server and proxy.
+# Note: The volumes at this container are refered at the root folder of the project.
+# Run the service at the root folder using the -f flag. 
+# Ex: docker compose -f services/caddy/docker-compose.yml up -d
 #
-# CADDY_IMAGE - The base image name for use. Default is caddy .
-# CADDY_VERSION - The version tag for use. Default is alpine . RECOMMENDED TAGS[latest, alpine]
-# APP_CADDY_CONTAINER_NAME - The container name
-# APP_TIMEZONE - The user Timezone.
-# APP_NETWORK_NAME - The network name of the docker services to be used.
-# APP_HTTP_PORT - The http host port.
-# APP_HTTPS_PORT - The https host port.
-# PWD - The context directory(usualy the root path of the cloned project)
-#
-# You can start this service using the following command at the root of the cloned project:
-#
-# sudo PWD=${PWD} docker compose --env-file services/caddy/.env.caddy -f services/caddy/docker-compose.yml up -d
+# Default HTTP_PORT is 8000 and can be changed with the env variables.
+# You can create the vhosts at sites folder using the Caddyfile syntax.
+# To disable the https redirect you can add { auto_https off } at the beginning of conf/CaddyFile
 #
 services:
   web:
-    image: ${CADDY_IMAGE}:${CADDY_VERSION}
-    container_name: ${APP_CADDY_CONTAINER_NAME}
-    restart: unless-stopped
+    image: ${CADDY_IMAGE:-caddy}:${CADDY_VERSION:-alpine}
+    container_name: ${APP_CADDY_CONTAINER_NAME:-app_caddy}
+    restart: on-failure
+    healthcheck:
+      test: wget --no-verbose --tries=1 --output-document=/dev/null http://127.0.0.1:2019/metrics &> /dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 2
+      start_period: 0s
     volumes:
       - $PWD/services/caddy/conf/CaddyFile:/etc/caddy/Caddyfile:ro
       - $PWD/services/caddy/services/:/etc/caddy/services/
@@ -29,18 +28,20 @@ services:
       - $PWD/docker-data/caddy/data:/data
       - $PWD/docker-data/caddy/config:/config
     networks:
-      - ${APP_NETWORK_NAME}
+      - ${APP_NETWORK_NAME:-app_network}
     cap_add:
       - NET_ADMIN
     environment:
-      TZ: ${APP_TIMEZONE}
+      TZ: ${APP_TIMEZONE:-America/Sao_Paulo}
     ports:
-      - "${APP_HTTP_PORT}:80"
-      - "${APP_HTTPS_PORT}:443"
-      - "${APP_HTTPS_PORT}:443/udp"
+      - "${APP_HTTP_PORT:-8000}:80"
+      - "${APP_HTTPS_PORT:-443}:443"
+      - "${APP_HTTPS_PORT:-443}:443/udp"
     expose:
       - 80 # http
       - 443 # https
+    mem_reservation: "15M"
+    mem_limit: "${CADDY_MEM_LIMIT:-300M}"
 volumes:
   app_volume:
     name: app_volume
@@ -50,5 +51,5 @@ volumes:
       device: $PWD/app
 networks:
   app_network:
-    name: ${APP_NETWORK_NAME}
+    name: ${APP_NETWORK_NAME:-app_network}
     driver: bridge

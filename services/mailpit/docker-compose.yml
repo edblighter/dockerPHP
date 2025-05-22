@@ -1,24 +1,34 @@
+# Container to run the Mailpit SMTP testing
+# 
+# Default smtp port is 1025
+# Default webUI port is 8025
 services:
   smtp:
-    container_name: ${APP_MAILPIT_CONTAINER}
-    restart: always
-    image: ${MAILPIT_IMAGE}:${MAILPIT_VERSION}
+    container_name: ${APP_MAILPIT_CONTAINER:-app_mailpit}
+    restart: unless-stopped
+    image: ${MAILPIT_IMAGE:-axllent/mailpit}:${MAILPIT_VERSION:-latest}
+    healthcheck:
+      test: wget --no-verbose --tries=1 --output-document=/dev/null http://127.0.0.1:8025/livez &> /dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 2
+      start_period: 0s
     environment:
-      TZ: ${APP_TIMEZONE}
-      MP_LABEL: ${APP_MAILPIT_CONTAINER}
+      TZ: ${APP_TIMEZONE:-America/Sao_Paulo}
+      MP_LABEL: ${APP_MAILPIT_CONTAINER:-app_mailpit}
       MP_MAX_MESSAGES: 0
       MP_VERBOSE: true
       MP_SMTP_AUTH_ACCEPT_ANY: true
       MP_SMTP_AUTH_ALLOW_INSECURE: true
     ports:
-      - ${APP_MAILPIT_SMTP_PORT}:1025
-      - ${APP_MAILPIT_WEB_PORT}:8025
+      - ${APP_MAILPIT_SMTP_PORT:-1025}:1025
+      - ${APP_MAILPIT_WEB_PORT:-8025}:8025
     networks:
-      - ${APP_NETWORK_NAME}
+      - ${APP_NETWORK_NAME:-app_network}
     expose:
       - 1025
       - 8025
 networks:
   app_network:
-    name: ${APP_NETWORK_NAME}
+    name: ${APP_NETWORK_NAME:-app_network}
     driver: bridge

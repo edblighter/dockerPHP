@@ -80,3 +80,4 @@ NGINX_VERSION=stable-alpine    # RECOMMENDED TAGS[latest, alpine, stable-bookwor
 # CADDY ENV
 CADDY_IMAGE=caddy
 CADDY_VERSION=alpine    # RECOMMENDED TAGS[latest, alpine]
+CADDY_MEM_LIMIT=300M

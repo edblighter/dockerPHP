@@ -43,6 +43,9 @@ networks:
   app_network:
     name: ${APP_NETWORK_NAME}
     driver: bridge
+    attachable: true
+    enable_ipv4: true
+    enable_ipv6: false
 secrets:
   db_root_password:
     file: $PWD/docker-data/$DATABASE/db_root_password.txt
