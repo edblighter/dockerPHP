@@ -14,8 +14,15 @@
 #
 services:
   web:
-    image: ${NGINX_IMAGE:-nginx}:${NGINX_VERSION:alpine}
+    image: ${NGINX_IMAGE:-nginx}:${NGINX_VERSION:-alpine}
     container_name: ${APP_NGINX_CONTAINER_NAME:-app_nginx}
+    restart: always
+    healthcheck:
+      #test: ["CMD-SHELL", "pg_isready -U $${APP_POSTGRES_USER}"]
+      test: ["CMD-SHELL", "wget -O /dev/null http://127.0.0.1  || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 2
     volumes:
       - app_volume:/var/www
       - $PWD/services/nginx/conf/conf.d:/etc/nginx/conf.d

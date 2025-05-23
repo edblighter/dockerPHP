@@ -68,6 +68,7 @@ ADMINER_DEFAULT_DRIVER=pgsql
 # REDIS ENV
 REDIS_IMAGE=redis      
 REDIS_VERSION=alpine    # RECOMMENDED TAGS[latest, alpine,  8-bookworm, 8-alpine]
+REDIS_MEM_LIMIT=500M
 
 # MAILPIT ENV
 MAILPIT_IMAGE=axllent/mailpit

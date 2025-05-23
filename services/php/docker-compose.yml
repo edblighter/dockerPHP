@@ -1,19 +1,40 @@
+# Container to run the PHP interpreter.
+# Note: The volumes at this container are refered at the root folder of the project.
+# Run the service at the root folder using the -f flag for the default values. 
+# Ex: docker compose -f services/php/docker-compose.yml up -d
+# or
+# docker compose -f services/php/docker-compose.yml --env-file services/php/.env.php up -d
+# to spin up the container with custom values.
+#
+# Default port is 9000 and is exposed only to the network container
+#
+# The app folder is shared at /var/www/
+#
+# The container have Bun integrated in the versions 8.4, 8.3 and 8.2 and composer to all versions.
+#
 services:
   app:
     build:
       context: .
-      dockerfile: $PWD/services/php/versions/Dockerfile.php${PHP_VERSION}-fpm
-    container_name: ${APP_CONTAINER_NAME}
+      dockerfile: $PWD/services/php/versions/Dockerfile.php${PHP_VERSION:-8.4}-fpm
+    container_name: ${APP_CONTAINER_NAME:-app_php}
     user: 1000:1000
     working_dir: /var/www
+    healthcheck:
+      test: bash /tmp/healthcheck.sh -h 127.0.0.1 -p 9000  # The healthcheck follow the parameters at www.conf
+      interval: 30s
+      timeout: 10s
+      retries: 2
+      start_period: 0s
     volumes:
       - app_volume:/var/www
       - $PWD/services/php/conf/php.ini:/usr/local/etc/php/php.ini:ro
+      - $PWD/services/php/healthcheck.sh:/tmp/healthcheck.sh
       - $PWD/services/php/conf/www.conf:/usr/local/etc/php-fpm.d/www.conf:ro
     environment:
-      TZ: ${APP_TIMEZONE}
+      TZ: ${APP_TIMEZONE:-America/Sao_Paulo}
     networks:
-      - ${APP_NETWORK_NAME}
+      - ${APP_NETWORK_NAME:-app_network}
     expose:
       - 9000 # The PHP service runs only in the internal app_network at the 9000
 volumes:
@@ -25,5 +46,5 @@ volumes:
       device: $PWD/app
 networks:
   app_network:
-    name: ${APP_NETWORK_NAME}
+    name: ${APP_NETWORK_NAME:-app_network}
     driver: bridge

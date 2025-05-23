@@ -11,6 +11,8 @@ RUN set -eux; \
     apt-get install -y --no-install-recommends \
         git \
         curl \
+        libfcgi0ldbl \
+        libfcgi-bin \
         libsodium-dev \
         libmemcached-dev \
         libcurl4-gnutls-dev \

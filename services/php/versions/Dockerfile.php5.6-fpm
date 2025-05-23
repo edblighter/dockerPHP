@@ -11,10 +11,12 @@ RUN set -eux; \
 # Install dependencies
 RUN set -eux; \
     apt-get update; \
-    apt-get upgrade -y; \
-    apt-get install -y --no-install-recommends \
+    apt-get upgrade -y --allow-unauthenticated; \
+    apt-get install -y --no-install-recommends --allow-unauthenticated \
         git \
         curl \
+        libfcgi0ldbl \
+        libfcgi-bin \
         libmcrypt-dev \
         libmemcached-dev \
         libcurl4-gnutls-dev \

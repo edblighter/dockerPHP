@@ -1,3 +1,17 @@
+# Multi services entry point
+#
+# To check the running services run the command:
+# docker ps | grep app_
+# or
+# docker stats --no-stream | grep app_
+
+# To check the stdout logs of a service run the command:
+# docker logs -f <container_name>
+#
+# To check the health log of a service run the command:
+# docker inspect -f '{{json .State.Health.Log}}' <container_name> | jq
+#
+
 services:
   app:
     extends:

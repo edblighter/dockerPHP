@@ -1,9 +1,26 @@
+# Container to run the PHPMyAdmin instance used to manage the MySQL/MariaDB when selected.
+# Default address via proxy http://dbadmin.localhost:8000 
+# or
+# Default address for standalone service http://127.0.0.1:9000
+#
+# You can spin a standalone version with the default variables or using the .env.phpmyadmin in this folder for custom values.
+# Ex: docker composer -f services/phpmyadmin/docker-compose.yml up -d
+# or using the .env.phpmyadmin
+# docker composer -f services/phpmyadmin/docker-compose.yml --env-file services/phpmyadmin/.env.phpmyadmin up -d
+#
 services:
   dbadmin:
     image: ${PHPMYADMIN_IMAGE:-phpmyadmin}:${PHPMYADMIN_VERSION:-latest}
     container_name: ${PHPMYADMIN_CONTAINER_NAME:-app_phpmyadmin}
     restart: always
+    healthcheck:
+      test: wget --no-verbose --tries=1 --output-document=/dev/null http://127.0.0.1:9000 &> /dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 2
+      start_period: 0s
     environment:
+      PMA_ARBITRARY: ${PHPMYADMIN_ARBITRARY:-1} # TODO: Check a way to not load the content below when arbitrary is 1
       PMA_ABSOLUTE_URI: ${PHPMYADMIN_URL:-http://127.0.0.1:9000}
       PMA_HOST: ${DB_HOST:-db}
       PMA_USER: ${APP_MYSQL_USER:-app}
@@ -13,7 +30,6 @@ services:
       MAX_EXECUTION_TIME: 600
       APACHE_PORT: 9000
       PMA_PORT: ${MYSQL_PORT:-3306}
-      PMA_ARBITRARY: ${PHPMYADMIN_ARBITRARY:-1}
       TZ: ${APP_TIMEZONE:-America/Sao_Paulo}
     ports:
       - 9000:9000

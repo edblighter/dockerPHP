@@ -11,6 +11,8 @@ RUN set -eux; \
     apt-get install -y --no-install-recommends \
         git \
         curl \
+        libfcgi0ldbl \
+        libfcgi-bin \
         libsodium-dev \
         libmemcached-dev \
         libcurl4-gnutls-dev \
@@ -38,7 +40,8 @@ RUN set -eux; \
 
 # INSTALL PHP MODULES
 RUN set -eux; \  
-    docker-php-ext-install pdo_mysql \
+    docker-php-ext-install \
+        pdo_mysql \
         pdo_pgsql \
         pdo_sqlite \
         mbstring \
@@ -51,19 +54,20 @@ RUN set -eux; \
         sodium \
         intl \
         curl; \
-    docker-php-ext-configure gd \
-    --prefix=/usr \
-    --with-jpeg \
-    --with-webp \
-    --with-xpm \
-    --with-freetype; \
+    docker-php-ext-configure \
+        gd \
+        --prefix=/usr \
+        --with-jpeg \
+        --with-webp \
+        --with-xpm \
+        --with-freetype; \
     docker-php-ext-install gd; 
 
 RUN usermod -u 1000 www-data
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
+# CopY BUN
 COPY --from=bun /usr/local/bin/bun /usr/local/bin
 
 RUN chmod 755 -R /var/www

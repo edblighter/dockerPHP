@@ -1,5 +1,7 @@
 # This image is intended to be a complete build 
 # with mysql,postgres and sqlite drivers
+FROM oven/bun:latest AS bun
+
 FROM php:7.4-fpm
 
 # Install dependencies
@@ -9,6 +11,8 @@ RUN set -eux; \
     apt-get install -y --no-install-recommends \
         git \
         curl \
+        libfcgi0ldbl \
+        libfcgi-bin \
         libsodium-dev \
         libmemcached-dev \
         libcurl4-gnutls-dev \
@@ -60,6 +64,8 @@ RUN usermod -u 1000 www-data
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# CopY BUN
+COPY --from=bun /usr/local/bin/bun /usr/local/bin
 
 WORKDIR /var/www
 
