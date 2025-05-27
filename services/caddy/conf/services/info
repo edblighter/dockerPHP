@@ -1,16 +1,28 @@
 info.localhost {
+    import common
+
     tls internal
+    encode zstd gzip
+    
+    root * /srv/public
+    file_server browse  # Show directory listing if no index.html is found
 
     log {
         # output logs to standard error (console)
         output stderr
     }
 
-    root * /srv/public
-
-    php_fastcgi app:9000 {
-        root /var/www/public
+    handle /static {
+        root * /srv/public
+        try_files {path} /index.static.html
+        file_server
     }
 
-    file_server
+    handle /php {
+        php_fastcgi app:9000 {
+            index index.php
+            root /var/www/public
+        }
+    }
+    
 }

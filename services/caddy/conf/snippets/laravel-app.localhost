@@ -1,19 +1,23 @@
-# snippets/laravel-app
-# {args.0} represents the root url and foldername of the app. 
+# snippets/laravel-app.localhost
+# {args.0} represents the name of the localhost url and foldername of the app. 
 
 (laravel-app.localhost) {
     {args.0}.localhost {
+        import common
+        import ../security
+
         tls internal
+        # Provide Zstd and Gzip compression
+        encode zstd gzip
+
         log {
             # output logs to standard error (console)
             output stderr
         }
+
         # Resolve the root directory for the app
         root * /srv/{args.0}/public
-
-        # Provide Zstd and Gzip compression
-        encode zstd gzip
-        import ../security
+        
         # Or serve a PHP site through php-fpm:
         php_fastcgi app:9000 {
             root /var/www/{args.0}/public

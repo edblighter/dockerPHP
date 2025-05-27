@@ -2,7 +2,7 @@
 #
 # Check php-fpm pool status
 #
-# Usage: check_php_fpm_lepidus.sh [-h host] [-p port] [-u socket] [-w warning] [-c critical] [-s status page] [-S secure]
+# Usage: healthcheck.sh [-h host] [-p port] [-u socket] [-w warning] [-c critical] [-s status page] [-S secure]
 #   -h, --host                  php-fpm status page host (ignored if using Unix socket)
 #   -p, --port                  php-fpm status page port (default: 9000)
 #   -u, --unix-socket           Path to Unix socket for php-fpm
@@ -57,7 +57,7 @@ while [[ -n "$1" ]]; do
 done
 
 host=${host:=127.0.0.1}
-port=${port:=9000}  # Define a porta padrão como 9000
+port=${port:=9000}  # Default fpm port 9000
 unix_socket=${unix_socket:-""}
 status_page=${status_page:='status'}
 warning=${warning:=90}
@@ -68,15 +68,15 @@ if [[ $warning -ge $critical ]]; then
   exit 3
 fi
 
-# Verifica se deve usar conexão via socket Unix ou IP
+# Check connection via socket Unix or IP
 if [[ -n $unix_socket ]]; then
-  # Conexão via Unix socket
+  # via Unix socket
   status=$(SCRIPT_NAME="/status" \
            SCRIPT_FILENAME="/status" \
            REQUEST_METHOD="GET" \
            cgi-fcgi -bind -connect "${unix_socket}")
 else
-  # Conexão via IP
+  # via IP
   status=$(SCRIPT_NAME="/status" \
            SCRIPT_FILENAME="/status" \
            REQUEST_METHOD="GET" \

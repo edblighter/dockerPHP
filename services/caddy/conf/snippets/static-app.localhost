@@ -1,0 +1,27 @@
+# snippets/static-app.localhost
+# {args[0]} represents the name of the localhost url and foldername of the app. 
+
+(static-app.localhost) {
+    {args[0]}.localhost {
+        import common
+        tls internal
+        encode zstd gzip
+        
+        log {
+            output stderr
+        }
+        
+        root * /srv/{args[0]}
+        file_server
+
+        handle_errors {
+            root * /srv/{args[0]}
+            @custom_err file /error-{err.status_code}.html /error.html
+            
+            handle @custom_err {
+                rewrite * {file_match.relative}
+                file_server
+            }
+        }
+    }
+}

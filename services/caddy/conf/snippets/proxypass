@@ -1,0 +1,34 @@
+# snippets/proxypass
+# {args[0]} represents the root url of the app.
+# {args[1]} represents the upstream target. Example: "app:9000"
+
+(proxypass) {
+    {args[0]} {
+        import common
+        encode zstd gzip
+
+        log {
+            output stderr
+        }
+
+        handle {
+            reverse_proxy * {args[1]} {
+                #header_up Host {http.request.host}
+                #header_up X-Real-IP {http.request.remote}
+                #header_up X-Forwarded-Port {http.request.port}
+            }
+        }
+
+        handle_errors {
+            root * /srv/public
+            @custom_err file /error-{err.status_code}.html /error.html
+            
+            handle @custom_err {
+                rewrite * {file_match.relative}
+                file_server
+            }
+        }
+
+
+    }
+}

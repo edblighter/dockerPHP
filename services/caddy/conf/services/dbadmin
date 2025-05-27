@@ -1,4 +1,1 @@
-dbadmin.localhost {
-  	tls internal
-	reverse_proxy dbadmin:9000
-}
+import proxypass dbadmin.localhost dbadmin:9000

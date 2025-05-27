@@ -1,0 +1,13 @@
+# snippets/domain-redirect
+# {args[0]} represents the from domain.
+# {args[1]} represents the target new domain
+
+(domain-redirect) {
+    {args[0]} {
+        redir https://{args[1]}{uri} permanent
+
+        log {
+            output stderr
+        }
+    }
+}
