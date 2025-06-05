@@ -57,31 +57,6 @@ usage() {
     exit 0
 }
 
-ports_check(){
-    PORTS=(80 443 8000 3306 5432 6379 1025 8025 9000)
-    IN_USE=0
-    for port in "${PORTS[@]}"
-    do
-        sudo lsof -Pi:${port} -sTCP:LISTEN -t > /dev/null
-        if [[ "$?" == 0 ]]; then
-            echo "Port ${port} is already in use"
-            IN_USE=1
-        fi
-    done
-    if [[ "$IN_USE" == 1 ]]; then
-        exit 1
-    fi
-}
-
-check_dependencies() {
-    for cmd in docker openssl; do
-        command -v "$cmd" >/dev/null || {
-            echo "Missing $cmd-please install it"
-            exit 1
-        }
-    done
-}
-
 main() {
     export WEB_SERVER=$1
     export DATABASE=$2
@@ -137,7 +112,5 @@ if [[ "$1" = "clear" ]]; then
     clear_env    
     exit 0
 else
-    check_dependencies
-    ports_check
     main $1 $2 $3
 fi
