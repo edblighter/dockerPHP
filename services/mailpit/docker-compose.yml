@@ -2,6 +2,13 @@
 # 
 # Default smtp port is 1025
 # Default webUI port is 8025
+
+x-mailpit-traefik: &labels-traefik
+  labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.smtp.rule=Host(`smtp.localhost`)"
+    - "traefik.http.routers.smtp.entrypoints=web"
+    - "traefik.http.services.smtp.loadbalancer.server.port=8025"
 services:
   smtp:
     container_name: ${APP_MAILPIT_CONTAINER:-app_mailpit}
@@ -13,6 +20,7 @@ services:
       timeout: 10s
       retries: 2
       start_period: 0s
+    <<: *labels-traefik
     environment:
       TZ: ${APP_TIMEZONE:-America/Sao_Paulo}
       MP_LABEL: ${APP_MAILPIT_CONTAINER:-app_mailpit}

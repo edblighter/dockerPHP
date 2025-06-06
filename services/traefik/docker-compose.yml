@@ -1,0 +1,26 @@
+services:
+  web:
+    image: ${TRAEFIK_IMAGE:-traefik}:${TRAEFIK_VERSION:-latest}
+    container_name: ${APP_TRAEFIK_CONTAINER_NAME:-app_traefik}
+    restart: always
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+    environment:
+      - name=value
+    ports:
+      - "80:80"     #Default HTTP
+      - "443:443"   #Default HTTPS
+      - "8080:8080" #Default Dashboard port
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - $PWD/services/traefik/conf/traefik.yml:/etc/traefik/traefik.yml
+    networks:
+      - ${APP_NETWORK_NAME:-app_network}
+    cap_add:
+      - NET_ADMIN
+networks:
+  app_network:
+    name: ${APP_NETWORK_NAME:-app_network}
+    driver: bridge
+    external: true

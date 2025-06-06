@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
-
 #set -x 
+# Docker Containers for web development
+#
+# Usage: run.sh [-w webserver] [-d database] up|down
+#   clear                    This will clean all default containers and ask to prune all docker containers.
+#   -w, --web                Choose a webserver (nginx,caddy or traefik)
+#   -d, --database           Choose a database (mysql,mariadb or postgres)
+#   -H, --help               Display this screen
+#
 
 clear_env() {
     echo "Clearing environment..."
@@ -52,8 +59,8 @@ clear_env() {
 }
 
 usage() {
-    echo "Usage: $0 [clear | help] [caddy|nginx] [mysql|mariadb|postgres] [up|down]"
-    echo "ex: $0 nginx mysql up  # this will set up the necessary services to run a nginx|php|mysql|phpmyadmin|redis|mailpit environment"
+    echo "Usage: $0 [clear] [-H | --help] [-w caddy|nginx] [-d mysql|mariadb|postgres] [up|down]"
+    echo "ex: $0 -w nginx -d mysql up  # this will set up the necessary services to run a nginx|php|mysql|phpmyadmin|redis|mailpit environment"
     exit 0
 }
 
@@ -103,14 +110,39 @@ main() {
     fi
 }
 
-if [[ "$1" = "help" ]]; then
+if [ "$#" -lt 1 ]; then
+    echo "Error: This script requires at least 1 argument."
     usage
-    exit 0
+    exit 1
 fi
 
-if [[ "$1" = "clear" ]]; then
-    clear_env    
-    exit 0
-else
-    main $1 $2 $3
-fi
+while [[ -n "$1" ]]; do
+  case $1 in
+  --web | -w)
+    WEBSERVER=$2
+    shift
+    ;;
+  --database | -d)
+    DATABASE=$2
+    shift
+    ;;
+   up | down)
+    MODE=$1
+    main ${WEBSERVER:="nginx"} ${DATABASE:="mysql"} ${MODE}
+    ;;
+   clear)
+    clear_env;
+    exit 0;
+    ;;
+  --help | -H)
+    sed -n '3,9p' "$0" | tr -d '#'
+    exit 3
+    ;;
+  *)
+    echo "Unknown argument: $1"
+    exec "$0" --help
+    exit 3
+    ;;
+  esac
+  shift
+done
