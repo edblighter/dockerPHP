@@ -1,11 +1,15 @@
+x-traefik: &labels-traefik
+  labels:
+    - "traefik.enable=false"
 services:
-  web:
+  proxy:
     image: ${TRAEFIK_IMAGE:-traefik}:${TRAEFIK_VERSION:-latest}
     container_name: ${APP_TRAEFIK_CONTAINER_NAME:-app_traefik}
     restart: always
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
+    <<: *labels-traefik
     environment:
       - name=value
     ports:

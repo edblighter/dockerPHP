@@ -1,9 +1,9 @@
 # Multi services entry point
 #
 # To check the running services run the command:
-# docker ps | grep app_
+# docker ps | egrep 'app_|tools_' 
 # or
-# docker stats --no-stream | grep app_
+# docker stats --no-stream | egrep 'app_|tools_'
 
 # To check the stdout logs of a service run the command:
 # docker logs -f <container_name>
@@ -12,6 +12,8 @@
 # docker inspect -f '{{json .State.Health.Log}}' <container_name> | jq
 #
 
+include:
+  - docker-compose.tools.yml
 services:
   app:
     extends:
@@ -19,6 +21,9 @@ services:
       service: app
     depends_on:
       - db
+      - portainer
+      - mailpit
+      - redis
   web:
     extends:
       file: $PWD/services/$WEB_SERVER/docker-compose.yml
@@ -35,14 +40,6 @@ services:
       service: dbadmin
     depends_on:
       - db
-  redis:
-    extends:
-      file: $PWD/services/redis/docker-compose.yml
-      service: redis
-  smtp:
-    extends:
-      file: $PWD/services/mailpit/docker-compose.yml
-      service: smtp
 volumes:
   cache:
     name: redis_cache

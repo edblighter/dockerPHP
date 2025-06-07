@@ -9,6 +9,8 @@ APP_MAILPIT_CONTAINER=app_mailpit   # Container running the Mailpit instance to 
 REDIS_CONTAINER=app_redis   # Container running the Redis instance (Default port 6379 - Change at APP_REDIS_PORT variable)
 APP_NGINX_CONTAINER_NAME=app_nginx  # Container running the Nginx web server (Default to HTTP_PORT = 8000)
 APP_CADDY_CONTAINER_NAME=app_caddy  # Container running the Caddy web server (Default to HTTP_PORT = 8000 and HTTPS available)
+APP_PORTAINER_CONTAINER_NAME=app_manager
+APP_TRAEFIK_CONTAINER_NAME=app_traefik
 
 # HOST LIST
 DB_HOST=db
@@ -82,3 +84,12 @@ NGINX_VERSION=stable-alpine    # RECOMMENDED TAGS[latest, alpine, stable-bookwor
 CADDY_IMAGE=caddy
 CADDY_VERSION=alpine    # RECOMMENDED TAGS[latest, alpine]
 CADDY_MEM_LIMIT=300M
+
+# PORTAINER ENV
+
+PORTAINER_IMAGE=portainer/portainer-ce
+PORTAINER_VERSION=latest
+
+# TRAEFIK ENV
+TRAEFIK_IMAGE=traefik
+TRAEFIK_VERSION=latest  # RECOMMENDED TAGS [latest, v2]

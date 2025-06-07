@@ -11,6 +11,11 @@
 # or
 # Via proxy http://dbadmin.localhost:8000 
 #
+x-mysql-traefik: &labels-traefik-mysql
+  labels:
+    - "traefik.enable=true"
+    - "traefik.tcp.routers.mysql.entrypoints=mysql"
+    - "traefik.tcp.services.mysql.loadbalancer.server.port=${MYSQL_PORT:-3306}"
 services:
   db:
     image: ${MYSQL_IMAGE:-mysql}:${MYSQL_VERSION:-lts}
@@ -23,6 +28,7 @@ services:
       timeout: 3s
       retries: 2
       start_period: 0s
+    <<: *labels-traefik-mysql
     environment:
       MYSQL_ROOT_PASSWORD_FILE: "/run/secrets/db_root_password" # openssl rand -base64 20 | sudo docker secret create db_root_password -
       MYSQL_DATABASE: ${APP_DATABASE_NAME:-app}

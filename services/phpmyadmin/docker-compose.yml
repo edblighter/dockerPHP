@@ -8,6 +8,13 @@
 # or using the .env.phpmyadmin
 # docker composer -f services/phpmyadmin/docker-compose.yml --env-file services/phpmyadmin/.env.phpmyadmin up -d
 #
+x-dbadmin-traefik: &labels-traefik-dbadmin
+  labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.dbadmin.rule=Host(`dbadmin.localhost`)"
+    - "traefik.http.routers.dbadmin.entrypoints=web"
+    - "traefik.http.services.dbadmin.loadbalancer.server.port=9000"
+
 services:
   dbadmin:
     image: ${PHPMYADMIN_IMAGE:-phpmyadmin}:${PHPMYADMIN_VERSION:-latest}
@@ -19,6 +26,7 @@ services:
       timeout: 10s
       retries: 2
       start_period: 0s
+    << : *labels-traefik-dbadmin
     environment:
       PMA_ARBITRARY: ${PHPMYADMIN_ARBITRARY:-1} # TODO: Check a way to not load the content below when arbitrary is 1
       PMA_ABSOLUTE_URI: ${PHPMYADMIN_URL:-http://127.0.0.1:9000}

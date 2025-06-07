@@ -8,6 +8,12 @@
 # or using the .env.adminer
 # docker composer -f services/adminer/docker-compose.yml --env-file services/adminer/.env.adminer up -d
 #
+x-dbadmin-traefik: &labels-traefik-dbadmin
+  labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.dbadmin.rule=Host(`dbadmin.localhost`)"
+    - "traefik.http.routers.dbadmin.entrypoints=web"
+    - "traefik.http.services.dbadmin.loadbalancer.server.port=9000"
 services:
   dbadmin:
     image: ${ADMINER_IMAGE:-wodby/adminer}:${ADMINER_VERSION:-latest}
@@ -19,6 +25,7 @@ services:
       timeout: 10s
       retries: 2
       start_period: 0s
+    << : *labels-traefik-dbadmin
     environment:
       ADMINER_DEFAULT_DB_DRIVER: ${ADMINER_DEFAULT_DRIVER:-pgsql}
       ADMINER_DEFAULT_DB_HOST: ${DB_HOST:-db}

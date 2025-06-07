@@ -5,11 +5,17 @@
 # or using the .env.redis
 # docker composer -f services/redis/docker-compose.yml --env-file services/redis/.env.redis up -d
 #
+x-redis-traefik: &labels-traefik-redis
+  labels:
+    - "traefik.enable=true"
+    - "traefik.tcp.routers.redis.entrypoints=redis"
+    - "traefik.tcp.services.redis.loadbalancer.server.port=${APP_REDIS_PORT:-6379}"
 services:
   redis:
     image: ${REDIS_IMAGE:-redis}:${REDIS_VERSION:-latest}
     container_name: ${REDIS_CONTAINER:-app_redis}
     restart: unless-stopped
+    << : *labels-traefik-redis
     healthcheck:
       test: redis-cli ping | grep PONG
       interval: 10s

@@ -11,6 +11,11 @@
 # or
 # Via proxy http://dbadmin.localhost:8000 
 #
+x-mariadb-traefik: &labels-traefik-mariadb
+  labels:
+    - "traefik.enable=true"
+    - "traefik.tcp.routers.mariadb.entrypoints=mysql"
+    - "traefik.tcp.services.mariadb.loadbalancer.server.port=${APP_MYSQL_PORT:-3306}"
 services:
   db:
     image: ${MARIADB_IMAGE:-mariadb}:${MARIADB_VERSION:-lts}
@@ -23,6 +28,7 @@ services:
       timeout: 3s
       retries: 2
       start_period: 0s
+    <<: *labels-traefik-mariadb
     environment:
       MARIADB_ROOT_PASSWORD_FILE: "/run/secrets/db_root_password" # openssl rand -base64 20 | sudo docker secret create db_root_password -
       MARIADB_DATABASE: ${APP_DATABASE_NAME:-app}

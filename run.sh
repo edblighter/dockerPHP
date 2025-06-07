@@ -23,6 +23,8 @@ clear_env() {
         docker-data/mariadb/db_root_password.txt
 
     sudo docker stop \
+        app_manager \
+        app_traefik \
         app_php \
         app_mysql \
         app_postgres \
@@ -34,6 +36,8 @@ clear_env() {
         app_mailpit \
         app_mariadb
     sudo docker rm \
+        app_manager \
+        app_traefik \
         app_php \
         app_mysql \
         app_postgres \

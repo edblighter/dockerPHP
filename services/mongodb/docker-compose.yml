@@ -1,0 +1,18 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: app_mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: change_this_password
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - ${APP_NETWORK_NAME:-app_network}
+networks:
+  app_network:
+    name: ${APP_NETWORK_NAME:-app_network}
+    driver: bridge
+    external: true

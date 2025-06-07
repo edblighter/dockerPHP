@@ -1,0 +1,27 @@
+x-portainer-traefik: &labels-traefik-portainer
+  labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.manager.rule=Host(`manager.localhost`)"
+    - "traefik.http.routers.manager.entrypoints=web"
+    - "traefik.http.services.manager.loadbalancer.server.port=9000"
+services:
+  portainer:
+    image: ${PORTAINER_IMAGE:-portainer/portainer-ce}:${PORTAINER_VERSION:-latest}
+    container_name: ${APP_PORTAINER_CONTAINER_NAME:-app_manager}
+    restart: unless-stopped
+    <<: *labels-traefik-portainer
+    expose:
+      - "9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - ${APP_NETWORK_NAME:-app_network}
+volumes:
+  portainer_data:
+networks:
+  app_network:
+    name: ${APP_NETWORK_NAME:-app_network}
+    driver: bridge
+    #external: true
+      

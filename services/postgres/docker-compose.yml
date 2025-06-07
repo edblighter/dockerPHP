@@ -11,6 +11,11 @@
 # or
 # Via proxy http://dbadmin.localhost:8000 
 #
+x-postgres-traefik: &labels-traefik-postgres
+  labels:
+    - "traefik.enable=true"
+    - "traefik.tcp.routers.postgres.entrypoints=postgres"
+    - "traefik.tcp.services.postgres.loadbalancer.server.port=${POSTGRES_PORT:-5432}"
 services:
   db:
     image: ${POSTGRES_IMAGE:-postgres}:${POSTGRES_VERSION:-alpine}
