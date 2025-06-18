@@ -10,10 +10,10 @@
 #
 x-dbadmin-traefik: &labels-traefik-dbadmin
   labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.dbadmin.rule=Host(`dbadmin.localhost`)"
-    - "traefik.http.routers.dbadmin.entrypoints=web"
-    - "traefik.http.services.dbadmin.loadbalancer.server.port=9000"
+    - "traefik.enable=false"
+    #- "traefik.http.routers.dbadmin.rule=Host(`dbadmin.localhost`)"
+#    - "traefik.http.routers.dbadmin.entrypoints=web"
+#    - "traefik.http.services.dbadmin.loadbalancer.server.port=9000"
 services:
   dbadmin:
     image: ${ADMINER_IMAGE:-wodby/adminer}:${ADMINER_VERSION:-latest}

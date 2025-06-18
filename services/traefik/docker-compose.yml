@@ -10,8 +10,6 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
     <<: *labels-traefik
-    environment:
-      - name=value
     ports:
       - "80:80"     #Default HTTP
       - "443:443"   #Default HTTPS

@@ -1,14 +1,22 @@
-# CONTAINERS NAME
+#### CONTAINERS NAME
+
+# INTERPRETER
 APP_CONTAINER_NAME=app_php  # Container running the php-fpm(Default port 9000)
+
+#DATABASES & TOOLS
 MYSQL_CONTAINER_NAME=app_mysql  # Container running the MySQL intance(Default port 3306 - Change at MYSQL_PORT variable)
 MARIADB_CONTAINER_NAME=app_mariadb  # Container running the MariaDB intance(Default port 3306 - Change at MYSQL_PORT variable)
-PHPMYADMIN_CONTAINER_NAME=app_phpmyadmin    # Container running the phpmyadmin to administer the MySQL/MariaDB when selected(Default address http://dbadmin.localhost:8000)
 POSTGRES_CONTAINER_NAME=app_postgres    # Container running the PostgreSQL intance(Default port 5432 - Change at POSTGRES_PORT)
-DBADMIN_CONTAINER_NAME=app_dbadmin  # Container running the Adminer instance used the administer the PostgreSQL when selected(Default address http://dbadmin.localhost:8000)
-APP_MAILPIT_CONTAINER=app_mailpit   # Container running the Mailpit instance to simulate SMTP sends (Default address http://smtp.localhost:8000)
 REDIS_CONTAINER=app_redis   # Container running the Redis instance (Default port 6379 - Change at APP_REDIS_PORT variable)
+PHPMYADMIN_CONTAINER_NAME=app_phpmyadmin    # Container running the phpmyadmin to administer the MySQL/MariaDB when selected(Default address http://dbadmin.localhost:8000)
+DBADMIN_CONTAINER_NAME=app_dbadmin  # Container running the Adminer instance used the administer the PostgreSQL when selected(Default address http://dbadmin.localhost:8000)
+
+#WEBSERVER
 APP_NGINX_CONTAINER_NAME=app_nginx  # Container running the Nginx web server (Default to HTTP_PORT = 8000)
 APP_CADDY_CONTAINER_NAME=app_caddy  # Container running the Caddy web server (Default to HTTP_PORT = 8000 and HTTPS available)
+
+# MISC TOOLS
+APP_MAILPIT_CONTAINER=app_mailpit   # Container running the Mailpit instance to simulate SMTP sends (Default address http://smtp.localhost:8000)
 APP_PORTAINER_CONTAINER_NAME=app_manager
 APP_TRAEFIK_CONTAINER_NAME=app_traefik
 
@@ -42,9 +50,10 @@ PHP_VERSION=8.4        # Supported Versions [8.4, 8.3, 8.2, 7.4, 5.6]
 # MYSQL ENV
 MYSQL_IMAGE=mysql
 MYSQL_VERSION=lts      # RECOMMENDED TAGS[latest, lts, 5.7]
+# MARIADB
 MARIADB_IMAGE=mariadb
 MARIADB_VERSION=lts      # RECOMMENDED TAGS[latest, lts, 10]
-
+# MYSQL COMMON DATA
 APP_MYSQL_USER=laravel
 APP_MYSQL_PASSWORD=secret
 MYSQLDATA_PATH="$PWD/docker-data/mysql/mysqldata"
@@ -67,6 +76,7 @@ POSTGRESDATA_PATH="$PWD/docker-data/postgres/data"
 ADMINER_IMAGE=wodby/adminer
 ADMINER_VERSION=latest    # RECOMMENDED TAGS[latest, 5, 5-4.2.1]
 ADMINER_DEFAULT_DRIVER=pgsql
+
 # REDIS ENV
 REDIS_IMAGE=redis      
 REDIS_VERSION=alpine    # RECOMMENDED TAGS[latest, alpine,  8-bookworm, 8-alpine]
@@ -86,7 +96,6 @@ CADDY_VERSION=alpine    # RECOMMENDED TAGS[latest, alpine]
 CADDY_MEM_LIMIT=300M
 
 # PORTAINER ENV
-
 PORTAINER_IMAGE=portainer/portainer-ce
 PORTAINER_VERSION=latest
 

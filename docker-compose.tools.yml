@@ -5,14 +5,14 @@ services:
       file: $PWD/services/portainer/docker-compose.yml
       service: portainer
   traefik:
-    container_name: tools_traefik
+    container_name: ${APP_TRAEFIK_CONTAINER_NAME:-tools_traefik}
     extends:
       file: $PWD/services/traefik/docker-compose.yml
       service: proxy
     depends_on:
       - portainer
   mailpit:
-    container_name: tools_mailpit
+    container_name: ${APP_MAILPIT_CONTAINER:-tools_mailpit}
     extends:
       file: $PWD/services/mailpit/docker-compose.yml
       service: smtp
@@ -32,7 +32,7 @@ volumes:
   portainer_data:
 networks:
   app_network:
-    name: ${APP_NETWORK_NAME}
+    name: ${APP_NETWORK_NAME:-app_network}
     driver: bridge
     attachable: true
     enable_ipv4: true
