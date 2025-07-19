@@ -4,7 +4,7 @@
 #
 # Usage: run.sh [-w webserver] [-d database] up|down
 #   clear                    This will clean all default containers and ask to prune all docker containers.
-#   -w, --web                Choose a webserver (nginx,caddy or traefik)
+#   -w, --web                Choose a webserver (nginx or caddy)
 #   -d, --database           Choose a database (mysql,mariadb or postgres)
 #   -H, --help               Display this screen
 #

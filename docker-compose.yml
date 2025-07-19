@@ -30,6 +30,8 @@ services:
       service: web
     depends_on:
       - app
+      - portainer
+      - traefik
   db:
     extends:
       file: $PWD/services/$DATABASE/docker-compose.yml

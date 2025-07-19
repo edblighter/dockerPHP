@@ -65,7 +65,6 @@ webserver_menu() {
     echo "Step 1: Choose Server Type"
     echo "1) Nginx"
     echo "2) Caddy"
-    echo "3) Traefik"
     echo "4) Go Back"
     echo
     read -rp "Select an option [1-4]: " choice
@@ -73,7 +72,6 @@ webserver_menu() {
     case "$choice" in
         1) WEBSERVER="nginx" ;;
         2) WEBSERVER="caddy" ;;
-        3) WEBSERVER="traefik" ;;
         4) return ;;
         *) echo "Invalid option"; pause; webserver_menu ;;
     esac
@@ -111,7 +109,7 @@ summary_menu() {
     echo "-----------------------------"
     echo "Web Server : ${WEBSERVER:-Not selected}"
     echo "Database   : ${DATABASE:-Not selected}"
-    echo "Services   : Aditional services[Mailpit, Redis, ${DBADMIN}]"
+    echo "Services   : Aditional services[Portainer, Traefik, Mailpit, Redis and ${DBADMIN}]"
     echo "-----------------------------"
     echo
     echo "1) Restart Configuration"
@@ -121,7 +119,7 @@ summary_menu() {
 
     case "$choice" in
         1) WEBSERVER=""; DATABASE=""; main_menu ;;
-        2) echo "Configuration complete. Running the Docker composer"; bash $PWD/run.sh ${WEBSERVER} ${DATABASE} up; exit 0 ;;
+        2) echo "Configuration complete. Running the Docker composer"; bash $PWD/run.sh -w ${WEBSERVER} -d ${DATABASE} up; exit 0 ;;
         *) echo "Invalid option"; pause; summary_menu ;;
     esac
 }
