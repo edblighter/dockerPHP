@@ -12,21 +12,31 @@
 # docker inspect -f '{{json .State.Health.Log}}' <container_name> | jq
 #
 
+# Build time is the time to build the entire project from scratch.;
+# Download using a 500Mbps connection, VM 6vCPU, 16GB RAM, SSD disk.
+# A average build time table is as follows:
+# For php 8.4-fpm.debian: 2m 54s - 
+# For php 8.4-fpm.alpine: 4m 00s - Final size 269Mb
+# For php 8.4-fpm.distro: 1m 37s - Final size 509Mb
 include:
   - docker-compose.tools.yml
 services:
   app:
     extends:
-      file: $PWD/services/php/docker-compose.yml
+      file: ./services/php/docker-compose.yml
       service: app
     depends_on:
-      - db
-      - portainer
-      - mailpit
-      - redis
+      db:
+        condition: service_healthy
+      portainer:
+        condition: service_started
+      mailpit:
+        condition: service_started
+      redis:
+        condition: service_healthy
   web:
     extends:
-      file: $PWD/services/$WEB_SERVER/docker-compose.yml
+      file: ./services/$WEB_SERVER/docker-compose.yml
       service: web
     depends_on:
       - app
@@ -34,18 +44,21 @@ services:
       - traefik
   db:
     extends:
-      file: $PWD/services/$DATABASE/docker-compose.yml
+      file: ./services/$DATABASE/docker-compose.yml
       service: db
   dbadmin:
     extends:
-      file: $PWD/services/$DATABASE/docker-compose.yml
+      file: ./services/$DATABASE/docker-compose.yml
       service: dbadmin
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 volumes:
   cache:
     name: redis_cache
     driver: local
+  # This volume mounts the host's ./app directory into containers.
+  # It is defined as a top-level volume to be easily reusable across services.
   app_volume:
     name: app_volume
     driver_opts:
@@ -61,4 +74,4 @@ networks:
     enable_ipv6: false
 secrets:
   db_root_password:
-    file: $PWD/docker-data/$DATABASE/db_root_password.txt
+    file: ./docker-data/$DATABASE/db_root_password.txt

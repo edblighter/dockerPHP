@@ -1,18 +1,16 @@
 # This image is intended to be a complete build 
 # with mysql,postgres and sqlite drivers
 FROM oven/bun:latest AS bun
+FROM composer:latest AS composer
 
 FROM php:8.4-fpm
 
-# Install dependencies
+# Install dependencies and PHP extensions in a single layer, and clean up build dependencies.
 RUN set -eux; \
     apt-get update; \
     apt-get upgrade -y; \
-    apt-get install -y --no-install-recommends \
-        git \
-        curl \
-        libfcgi0ldbl \
-        libfcgi-bin \
+    buildDeps=" \
+        build-essential \
         libsodium-dev \
         libmemcached-dev \
         libcurl4-gnutls-dev \
@@ -28,19 +26,21 @@ RUN set -eux; \
         libonig-dev \
         libxml2-dev \
         libsqlite3-dev \
-        sqlite3 \
         libzip-dev \
+    "; \
+    apt-get install -y --no-install-recommends $buildDeps \
+        git \
+        curl; \
+    echo "$buildDeps" > /tmp/.build-deps; \
+    apt-get install -y --no-install-recommends \
+        libfcgi0ldbl \
+        libfcgi-bin \
+        sqlite3 \
         zip \
         unzip \
         default-mysql-client \
         postgresql-client; \
-    apt-get autoclean; \
-    apt-get autoremove -y; \
-    rm -rf /var/lib/apt/lists/*
-
-# INSTALL PHP MODULES
-RUN set -eux; \  
-    docker-php-ext-install \
+    docker-php-ext-install -j$(nproc)\
         pdo_mysql \
         pdo_pgsql \
         pdo_sqlite \
@@ -61,18 +61,19 @@ RUN set -eux; \
         --with-webp \
         --with-xpm \
         --with-freetype; \
-    docker-php-ext-install gd; 
+    docker-php-ext-install -j$(nproc) gd; \
+    apt-get purge -y $(cat /tmp/.build-deps); \
+    rm -f /tmp/.build-deps; \
+    apt-get autoremove -y; \
+    apt-get clean; \
+    rm -rf /var/lib/apt/lists/* ;
 
-RUN usermod -u 1000 www-data
+#RUN usermod -u 1000 www-data
 
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-# CopY BUN
+COPY --from=composer /usr/bin/composer /usr/bin/composer
 COPY --from=bun /usr/local/bin/bun /usr/local/bin
 
-RUN chmod 755 -R /var/www
-
+RUN usermod -u 1000 www-data && chown -R www-data:www-data /var/www && chmod 755 /var/www
 WORKDIR /var/www
 
 CMD ["php-fpm"]
-

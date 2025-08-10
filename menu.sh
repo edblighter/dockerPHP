@@ -1,50 +1,92 @@
 #!/usr/bin/env bash
-#set -x 
+#set -x
 
-check_dependencies() {
-    DEPS=0
-    for cmd in docker openssl;  do  # TODO: Create a list for the deps.
-        echo "Checking ${cmd}"
-        command -v "$cmd" >/dev/null || {
-            echo "... Missing $cmd please install it"
-            let DEPS++
-            exit 1
-        } 
-        echo "... OK"
-    done
-}
-
-load_env() {
-    set -o allexport
-    source .env.app
-    set +o allexport
-}
-
-ports_check() {
-    PORTS=(80 443 8000 3306 5432 6379 1025 8025 9000) # TODO: Pick the list in the env vars
-    IN_USE=0
-    for port in "${PORTS[@]}"
-    do
-        echo "Checking port ${port}:"
-        sudo lsof -Pi:${port} -sTCP:LISTEN -t > /dev/null
-        if [[ "$?" == 0 ]]; then
-            echo "Port ${port} is already in use"
-            let IN_USE++
-        else
-            echo "... Free to use"
-        fi
-    done
-    if [[ "$IN_USE" == 1 ]]; then
-        exit 1
-    fi
-}
-
+# --- Configuration & State ---
 # Variables to store configuration
 WEBSERVER=""
 DATABASE=""
-services=()
 
-# Function to print header
+# Variables to store check statuses
+DEPS_STATUS="Not Checked"
+PORTS_STATUS="Not Checked"
+DEPS_MISSING=0
+PORTS_IN_USE=0
+
+# --- Core Functions ---
+
+# Load environment variables from .env.app file
+load_env() {
+    if [ -f .env.app ]; then
+        set -o allexport
+        source .env.app
+        set +o allexport
+    else
+        echo "Warning: .env.app file not found. Using default values."
+    fi
+}
+
+# Check for required command-line tools
+check_dependencies() {
+    local dependencies=("docker" "openssl" "lsof")
+    DEPS_MISSING=0
+    DEPS_STATUS="OK"
+
+    print_header
+    echo "Checking dependencies..."
+    for cmd in "${dependencies[@]}"; do
+        if ! command -v "$cmd" &> /dev/null; then
+            echo "  - $cmd: [MISSING] Please install it."
+            ((DEPS_MISSING++))
+            DEPS_STATUS="FAIL"
+        else
+            echo "  - $cmd: [OK]"
+        fi
+    done
+
+    if [[ "$DEPS_STATUS" == "FAIL" ]]; then
+        echo
+        echo "Error: $DEPS_MISSING missing dependencies. Please install them to continue."
+    fi
+}
+
+# Check for conflicting ports
+ports_check() {
+    # These variables should be defined in your .env.app file
+    local required_ports=(
+        "${HTTP_PORT:-80}"
+        "${HTTPS_PORT:-443}"
+        "${PHPMYADMIN_PORT:-8000}"
+        "${MYSQL_PORT:-3306}"
+        "${POSTGRES_PORT:-5432}"
+        "${REDIS_PORT:-6379}"
+        "${MAILPIT_SMTP_PORT:-1025}"
+        "${MAILPIT_UI_PORT:-8025}"
+        "${PORTAINER_PORT:-9000}"
+    )
+    PORTS_IN_USE=0
+    PORTS_STATUS="OK"
+
+    print_header
+    echo "Checking required ports..."
+    for port in "${required_ports[@]}"; do
+        if sudo lsof -Pi:"$port" -sTCP:LISTEN -t &> /dev/null; then
+            echo "  - Port $port: [IN USE]"
+            ((PORTS_IN_USE++))
+            PORTS_STATUS="FAIL"
+        else
+            echo "  - Port $port: [OK]"
+        fi
+    done
+
+    if [[ "$PORTS_STATUS" == "FAIL" ]]; then
+        echo
+        echo "Warning: $PORTS_IN_USE port(s) are already in use. This may cause conflicts."
+    fi
+}
+
+# --- UI Functions ---
+
+# Function to print a standardized header
 print_header() {
     clear
     echo "======================================="
@@ -53,101 +95,145 @@ print_header() {
     echo
 }
 
-# Function to pause
+# Function to pause execution until user presses Enter
 pause() {
     echo
     read -rp "Press ENTER to continue..." _
 }
 
+# --- Menus ---
+
 # Web Server Type Menu
 webserver_menu() {
-    print_header
-    echo "Step 1: Choose Server Type"
-    echo "1) Nginx"
-    echo "2) Caddy"
-    echo "4) Go Back"
-    echo
-    read -rp "Select an option [1-4]: " choice
-
-    case "$choice" in
-        1) WEBSERVER="nginx" ;;
-        2) WEBSERVER="caddy" ;;
-        4) return ;;
-        *) echo "Invalid option"; pause; webserver_menu ;;
-    esac
-}
-# Database Server Type Menu
-database_menu() {
-    print_header
-    echo "Step 1: Choose Server Type"
-    echo "1) MySQL"
-    echo "2) MariaDB"
-    echo "3) PostgreSQL"
-    echo "4) Go Back"
-    echo
-    read -rp "Select an option [1-4]: " choice
-
-    case "$choice" in
-        1) DATABASE="mysql" ;;
-        2) DATABASE="mariadb" ;;
-        3) DATABASE="postgres" ;;
-        4) return ;;
-        *) echo "Invalid option"; pause; database_menu ;;
-    esac
-}
-# Summary Menu
-summary_menu() {
-    print_header
-    if [[ "$DATABASE" = "mysql" || "$DATABASE" = "mariadb" ]]; then
-        DBADMIN="PHPMyAdmin"
-    elif [[ "$DATABASE" = "postgres" ]];then
-        DBADMIN="Adminer"
-    else
-        DBADMIN="Database type not selected yet!"
-    fi
-    echo " Configuration Summary "
-    echo "-----------------------------"
-    echo "Web Server : ${WEBSERVER:-Not selected}"
-    echo "Database   : ${DATABASE:-Not selected}"
-    echo "Services   : Aditional services[Portainer, Traefik, Mailpit, Redis and ${DBADMIN}]"
-    echo "-----------------------------"
-    echo
-    echo "1) Restart Configuration"
-    echo "2) Run"
-    echo
-    read -rp "Choose an option [1-2]: " choice
-
-    case "$choice" in
-        1) WEBSERVER=""; DATABASE=""; main_menu ;;
-        2) echo "Configuration complete. Running the Docker composer"; bash $PWD/run.sh -w ${WEBSERVER} -d ${DATABASE} up; exit 0 ;;
-        *) echo "Invalid option"; pause; summary_menu ;;
-    esac
-}
-# Main Menu
-main_menu() {
     while true; do
         print_header
-        echo "Main Menu "
-        echo "1) Check Dependencies      [${DEPS:-Not Checked} dependencies]"
-        echo "2) Check (un)used Ports    [${IN_USE:-Not Checked} used ports]"
-        echo "3) Set your Web Server     [${WEBSERVER:-Not set}]"
-        echo "4) Select the Database     [${DATABASE:-Not set}]"
-        echo "5) Show Summary"
-        
+        echo "Step 1: Choose Your Web Server"
+        echo "1) Nginx"
+        echo "2) Caddy"
+        echo "3) Go Back"
         echo
-        read -rp "Select an option [1-4]: " main_choice
+        read -rp "Select an option [1-3]: " choice
 
-        case "$main_choice" in
-            1) check_dependencies ;pause;;
-            2) ports_check ; pause;;
-            3) webserver_menu ;;
-            4) database_menu ;;
-            5) summary_menu ;;
+        case "$choice" in
+            1) WEBSERVER="nginx"; break ;;
+            2) WEBSERVER="caddy"; break ;;
+            3) break ;;
             *) echo "Invalid option"; pause ;;
         esac
     done
 }
 
-check_dependencies
-ports_check
+# Database Server Type Menu
+database_menu() {
+    while true; do
+        print_header
+        echo "Step 2: Choose Your Database"
+        echo "1) MySQL"
+        echo "2) MariaDB"
+        echo "3) PostgreSQL"
+        echo "4) Go Back"
+        echo
+        read -rp "Select an option [1-4]: " choice
+
+        case "$choice" in
+            1) DATABASE="mysql"; break ;;
+            2) DATABASE="mariadb"; break ;;
+            3) DATABASE="postgres"; break ;;
+            4) break ;;
+            *) echo "Invalid option"; pause ;;
+        esac
+    done
+}
+
+# Summary and Execution Menu
+summary_menu() {
+    while true; do
+        print_header
+        local db_admin_tool="Not applicable"
+        if [[ "$DATABASE" == "mysql" || "$DATABASE" == "mariadb" ]]; then
+            db_admin_tool="PHPMyAdmin"
+        elif [[ "$DATABASE" == "postgres" ]]; then
+            db_admin_tool="Adminer"
+        fi
+
+        echo "Configuration Summary"
+        echo "-------------------------------------"
+        echo "Web Server: ${WEBSERVER:-Not Selected}"
+        echo "Database:   ${DATABASE:-Not Selected}"
+        echo "Services:   Portainer, Traefik, Mailpit, Redis, and ${db_admin_tool}"
+        echo "-------------------------------------"
+        echo
+
+        # Validation checks
+        local can_run=true
+        if [[ "$DEPS_STATUS" != "OK" ]]; then
+            echo "Warning: Dependency check has not passed. [Status: $DEPS_STATUS]"
+            can_run=false
+        fi
+        if [[ "$PORTS_STATUS" == "FAIL" ]]; then
+            echo "Warning: There are port conflicts. [Status: $PORTS_STATUS]"
+        fi
+        if [[ -z "$WEBSERVER" || -z "$DATABASE" ]]; then
+            echo "Warning: Web server or database not selected."
+            can_run=false
+        fi
+
+        echo
+        echo "1) Run Environment"
+        echo "2) Restart Configuration"
+        echo "3) Go Back"
+        echo
+        read -rp "Choose an option [1-3]: " choice
+
+        case "$choice" in
+            1)
+                if [[ "$can_run" == "true" ]]; then
+                    echo "Configuration complete. Running the Docker environment..."
+                    bash "$PWD/run.sh" -w "$WEBSERVER" -d "$DATABASE" up
+                    exit 0
+                else
+                    echo "Cannot run due to configuration errors or missing selections."
+                    pause
+                fi
+                ;;
+            2)
+                WEBSERVER=""
+                DATABASE=""
+                # Keep check statuses
+                main_menu
+                ;;
+            3) break ;;
+            *) echo "Invalid option"; pause ;;
+        esac
+    done
+}
+
+# Main Menu
+main_menu() {
+    while true; do
+        print_header
+        echo "Main Menu"
+        echo "1) Check Dependencies      [Status: ${DEPS_STATUS}]"
+        echo "2) Check Required Ports    [Status: ${PORTS_STATUS}]"
+        echo "3) Set Web Server          [Current: ${WEBSERVER:-Not Set}]"
+        echo "4) Set Database            [Current: ${DATABASE:-Not Set}]"
+        echo "5) View Summary & Run"
+        echo "6) Exit"
+        echo
+        read -rp "Select an option [1-6]: " main_choice
+
+        case "$main_choice" in
+            1) check_dependencies; pause ;;
+            2) ports_check; pause ;;
+            3) webserver_menu ;;
+            4) database_menu ;;
+            5) summary_menu ;;
+            6) exit 0 ;;
+            *) echo "Invalid option"; pause ;;
+        esac
+    done
+}
+
+# --- Script Entrypoint ---
+load_env
 main_menu

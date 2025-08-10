@@ -1,152 +1,169 @@
 #!/usr/bin/env bash
-#set -x 
+#set -x
 # Docker Containers for web development
 #
-# Usage: run.sh [-w webserver] [-d database] up|down
-#   clear                    This will clean all default containers and ask to prune all docker containers.
-#   -w, --web                Choose a webserver (nginx or caddy)
-#   -d, --database           Choose a database (mysql,mariadb or postgres)
-#   -H, --help               Display this screen
-#
+# Optimized version of the script.
 
+# --- Configuration ---
+# Default values for options
+WEBSERVER="nginx"
+DATABASE="mysql"
+MODE=""
+
+# List of containers to manage.
+# Assuming 'app_' prefix is correct for services based on original script.
+APP_CONTAINERS=(
+    app_manager
+    app_traefik
+    app_php
+    app_mysql
+    app_postgres
+    app_redis
+    app_phpmyadmin
+    app_dbadmin
+    app_nginx
+    app_caddy
+    app_mailpit
+    app_mariadb
+)
+APP_VOLUMES=(redis_cache app_volume)
+APP_NETWORK="app_network"
+
+# --- Functions ---
+
+# Function to display help message
+usage() {
+    cat <<EOF
+Usage: $0 [options] [command]
+
+Docker Containers for web development.
+
+Options:
+  -w, --web <server>      Choose a webserver (nginx or caddy). Default: ${WEBSERVER}
+  -d, --database <db>     Choose a database (mysql, mariadb, or postgres). Default: ${DATABASE}
+  -H, --help              Display this screen.
+
+Commands:
+  up                      Start and build the services.
+  down                    Stop the services.
+  clear                   Stop and remove all containers, volumes, and data.
+
+Examples:
+  $0 -w nginx -d mysql up
+  $0 down
+  $0 clear
+EOF
+    exit 1
+}
+
+# Function to completely clear the environment
 clear_env() {
     echo "Clearing environment..."
-    sudo rm -rf \
-        docker-data/caddy/config \
-        docker-data/caddy/data \
-        docker-data/mysql/mysqldata \
-        docker-data/postgres/data \
-        docker-data/postgres/logs \
-        docker-data/nginx/logs \
-        docker-data/postgres/db_root_password.txt \
-        docker-data/mysql/db_root_password.txt \
-        docker-data/mariadb/db_root_password.txt
 
-    sudo docker stop \
-        tools_manager \
-        tools_traefik \
-        app_php \
-        app_mysql \
-        app_postgres \
-        tools_redis \
-        app_phpmyadmin \
-        app_dbadmin \
-        app_nginx \
-        app_caddy \
-        tools_mailpit \
-        app_mariadb
-    sudo docker rm \
-        app_manager \
-        app_traefik \
-        app_php \
-        app_mysql \
-        app_postgres \
-        app_redis \
-        app_phpmyadmin \
-        app_dbadmin \
-        app_nginx \
-        app_caddy \
-        app_mailpit \
-        app_mariadb
-    sudo docker volume rm \
-        redis_cache \
-        app_volume
-    sudo docker network rm \
-        app_network
+    echo "Stopping and removing containers..."
+    sudo docker rm -f "${APP_CONTAINERS[@]}" 2>/dev/null || true
 
-    echo "##### ATTENTION the following commands will erase all stopped docker containers and associated volumes. Say NO if you don't know what to do. ###"
-    sudo docker system prune --all
-    sudo docker volume prune --all
-    sudo docker network prune
+    echo "Removing volumes..."
+    sudo docker volume rm "${APP_VOLUMES[@]}" 2>/dev/null || true
+
+    echo "Removing network..."
+    sudo docker network rm "${APP_NETWORK}" 2>/dev/null || true
+
+    echo "Removing data directories..."
+    sudo rm -rf docker-data
+
+    echo "##### ATTENTION: The following commands will erase all stopped Docker containers, networks, and images not associated with a container. Proceed with caution. ###"
+    sudo docker system prune --all --force
+
+    echo "##### ATTENTION: The following command will erase all unused local volumes. Proceed with caution. ###"
+    sudo docker volume prune --all --force
+
     echo "Environment cleared."
     exit 0
 }
 
-usage() {
-    echo "Usage: $0 [clear] [-H | --help] [-w caddy|nginx] [-d mysql|mariadb|postgres] [up|down]"
-    echo "ex: $0 -w nginx -d mysql up  # this will set up the necessary services to run a nginx|php|mysql|phpmyadmin|redis|mailpit environment"
-    exit 0
-}
+# Function to start the services
+run_up() {
+    echo "Creating minimal data folders..."
+    mkdir -p "docker-data/php" "docker-data/${DATABASE}" "docker-data/${WEBSERVER}"
 
-main() {
-    export WEB_SERVER=$1
-    export DATABASE=$2
-    export MODE=$3
-
-    if [[ -z "$WEB_SERVER" ]]; then
-        echo 'You must specify the name of the web server to be utilized - caddy or nginx'
-        usage
-        exit 1
-    elif [[ "$WEB_SERVER" = "caddy" || "$WEB_SERVER" = "nginx" ]]; then
-        if [[ -z "$DATABASE" ]]; then
-            echo 'You must specify the name of the database server to be utilized - mysql or mariadb or postgres'
-            usage
-            exit 1
-        elif [[ "$DATABASE" = "mysql" || "$DATABASE" = "mariadb" || "$DATABASE" = "postgres" ]]; then
-            if [[ -z "$MODE" ]]; then
-                echo 'You must specify the mode for the services - up or down'
-                usage
-                exit 1
-            elif [[ "$MODE" = "up" || "$MODE" = "down" ]]; then
-                if [[ "$MODE" = "up" ]]; then
-                    echo "Creating minimal data folders"
-                    mkdir -p docker-data/php docker-data/$DATABASE docker-data/$WEB_SERVER
-                    if [[ "$DATABASE" = "postgres" ]]; then
-                        echo "Adjusting permissions for the postgres log folder"
-                        mkdir -p docker-data/$DATABASE/logs
-                        sudo chown :70 docker-data/$DATABASE/logs
-                        sudo chmod 770 docker-data/$DATABASE/logs
-                        sudo chmod g+s docker-data/$DATABASE/logs
-                    fi
-                    echo 'Generating the database root password file'
-                    openssl rand -base64 20 > docker-data/$DATABASE/db_root_password.txt
-                    echo 'Running the docker compose up and building services'
-                    sudo PWD=${PWD} COMPOSE_BAKE=true WEB_SERVER="$WEB_SERVER" DATABASE="$DATABASE" docker compose --env-file .env.app up -d --build
-                    exit 0
-                elif [[ "$MODE" = "down" ]]; then
-                    echo 'Running the docker compose down and removing services'
-                    sudo PWD=${PWD} WEB_SERVER="$WEB_SERVER" DATABASE="$DATABASE" docker compose --env-file .env.app down
-                    #clear_env
-                    exit 0
-                fi
-            fi
-        fi
+    if [[ "${DATABASE}" = "postgres" ]]; then
+        echo "Adjusting permissions for the postgres log folder..."
+        mkdir -p "docker-data/${DATABASE}/logs"
+        sudo chown :70 "docker-data/${DATABASE}/logs"
+        sudo chmod 770 "docker-data/${DATABASE}/logs"
+        sudo chmod g+s "docker-data/${DATABASE}/logs"
     fi
+
+    echo "Generating the database root password file..."
+    # Ensure the directory exists before writing to the file
+    mkdir -p "docker-data/${DATABASE}"
+    openssl rand -base64 20 | sudo tee "docker-data/${DATABASE}/db_root_password.txt" > /dev/null
+
+    echo "Running docker-compose up and building services..."
+    sudo PWD="${PWD}" WEB_SERVER="$WEBSERVER" DATABASE="$DATABASE" COMPOSE_BAKE=true docker compose --env-file .env.app up -d --build
 }
 
-if [ "$#" -lt 1 ]; then
-    echo "Error: This script requires at least 1 argument."
+# Function to stop the services
+run_down() {
+    echo "Running docker-compose down..."
+    sudo PWD="${PWD}" WEB_SERVER="$WEBSERVER" DATABASE="$DATABASE" docker compose --env-file .env.app down
+}
+
+# --- Main script execution ---
+
+# Parse command-line arguments
+if [ "$#" -eq 0 ]; then
     usage
-    exit 1
 fi
 
-while [[ -n "$1" ]]; do
-  case $1 in
-  --web | -w)
-    WEBSERVER=$2
-    shift
-    ;;
-  --database | -d)
-    DATABASE=$2
-    shift
-    ;;
-   up | down)
-    MODE=$1
-    main ${WEBSERVER:="nginx"} ${DATABASE:="mysql"} ${MODE}
-    ;;
-   clear)
-    clear_env;
-    exit 0;
-    ;;
-  --help | -H)
-    sed -n '3,9p' "$0" | tr -d '#'
-    exit 3
-    ;;
-  *)
-    echo "Unknown argument: $1"
-    exec "$0" --help
-    exit 3
-    ;;
-  esac
-  shift
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -w|--web)
+            WEBSERVER="$2"
+            shift 2
+            ;;
+        -d|--database)
+            DATABASE="$2"
+            shift 2
+            ;;
+        -H|--help)
+            usage
+            ;;
+        up|down|clear)
+            if [[ -n "$MODE" ]]; then
+                echo "Error: Only one command (up, down, clear) can be specified."
+                usage
+            fi
+            MODE="$1"
+            shift 1
+            ;;
+        *)
+            echo "Unknown argument: $1"
+            usage
+            ;;
+    esac
 done
+
+# Validate arguments and execute command
+case "${MODE}" in
+    up)
+        [[ "${WEBSERVER}" =~ ^(caddy|nginx)$ ]] || { echo "Invalid web server: ${WEBSERVER}"; usage; }
+        [[ "${DATABASE}" =~ ^(mysql|mariadb|postgres)$ ]] || { echo "Invalid database: ${DATABASE}"; usage; }
+        run_up
+        ;;
+    down)
+        [[ "${WEBSERVER}" =~ ^(caddy|nginx)$ ]] || { echo "Invalid web server: ${WEBSERVER}"; usage; }
+        [[ "${DATABASE}" =~ ^(mysql|mariadb|postgres)$ ]] || { echo "Invalid database: ${DATABASE}"; usage; }
+        run_down
+        ;;
+    clear)
+        clear_env
+        ;;
+    *)
+        echo "Error: No command specified (up, down, or clear)."
+        usage
+        ;;
+esac
+
+exit 0

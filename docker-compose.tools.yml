@@ -2,29 +2,23 @@ services:
   portainer:
     container_name: tools_portainer
     extends:
-      file: $PWD/services/portainer/docker-compose.yml
+      file: ./services/portainer/docker-compose.yml
       service: portainer
   traefik:
     container_name: ${APP_TRAEFIK_CONTAINER_NAME:-tools_traefik}
     extends:
-      file: $PWD/services/traefik/docker-compose.yml
+      file: ./services/traefik/docker-compose.yml
       service: proxy
-    depends_on:
-      - portainer
   mailpit:
-    container_name: ${APP_MAILPIT_CONTAINER:-tools_mailpit}
+    container_name: ${APP_MAILpit_CONTAINER:-tools_mailpit}
     extends:
-      file: $PWD/services/mailpit/docker-compose.yml
+      file: ./services/mailpit/docker-compose.yml
       service: smtp
-    depends_on:
-      - portainer
   redis:
     container_name: tools_redis
     extends:
-      file: $PWD/services/redis/docker-compose.yml
+      file: ./services/redis/docker-compose.yml
       service: redis
-    depends_on:
-      - portainer
 volumes:
   cache:
     name: redis_cache

@@ -19,7 +19,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: $PWD/services/php/versions/Dockerfile.php${PHP_VERSION:-8.4}-fpm
+      dockerfile: $PWD/services/php/versions/Dockerfile.php${PHP_VERSION:-8.4}-fpm${PHP_VARIANT:-.alpine}
     container_name: ${APP_CONTAINER_NAME:-app_php}
     user: 1000:1000
     working_dir: /var/www
@@ -35,12 +35,15 @@ services:
       - $PWD/services/php/conf/php.ini:/usr/local/etc/php/php.ini:ro
       - $PWD/services/php/healthcheck.sh:/tmp/healthcheck.sh
       - $PWD/services/php/conf/www.conf:/usr/local/etc/php-fpm.d/www.conf:ro
+      # Debian folder structure
+      #- $PWD/services/php/conf/php.ini:/etc/php/8.4/fpm/php.ini:ro
+      #- $PWD/services/php/conf/www.conf:/etc/php/8.4/fpm/pool.d/www.conf:ro
     environment:
       TZ: ${APP_TIMEZONE:-America/Sao_Paulo}
     networks:
       - ${APP_NETWORK_NAME:-app_network}
     expose:
-      - 9000 # The PHP service runs only in the internal app_network at the 9000
+      - 9000 # The PHP service runs only in the internal app_network at the port 9000
 volumes:
   app_volume:
     name: app_volume
