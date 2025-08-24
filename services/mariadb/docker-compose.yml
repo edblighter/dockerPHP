@@ -47,6 +47,8 @@ services:
       - $PWD/services/mariadb/conf/50-server.cnf:/etc/mysql/mariadb.conf.d/50-server.cnf
     networks:
       - ${APP_NETWORK_NAME:-app_network}
+    mem_reservation: 500M
+    mem_limit: ${MYSQL_MEM_LIMIT:-1G}
   dbadmin:
     extends:
       file: $PWD/services/phpmyadmin/docker-compose.yml

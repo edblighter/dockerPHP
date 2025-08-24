@@ -59,8 +59,8 @@ ports_check() {
         "${MYSQL_PORT:-3306}"
         "${POSTGRES_PORT:-5432}"
         "${REDIS_PORT:-6379}"
-        "${MAILPIT_SMTP_PORT:-1025}"
-        "${MAILPIT_UI_PORT:-8025}"
+        "${MAILPIT_PORT_SMTP:-1025}"
+        "${MAILPIT_PORT_UI:-8025}"
         "${PORTAINER_PORT:-9000}"
     )
     PORTS_IN_USE=0

@@ -44,6 +44,8 @@ services:
       - ${APP_NETWORK_NAME:-app_network}
     expose:
       - 9000 # The PHP service runs only in the internal app_network at the port 9000
+    mem_reservation: 50M
+    mem_limit: ${PHP_MEM_LIMIT:-1G}  # Memory limit for the php container
 volumes:
   app_volume:
     name: app_volume

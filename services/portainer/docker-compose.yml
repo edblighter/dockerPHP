@@ -17,6 +17,8 @@ services:
       - portainer_data:/data
     networks:
       - ${APP_NETWORK_NAME:-app_network}
+    mem_reservation: 25M
+    mem_limit: ${PORTAINER_MEM_LIMIT:-256M}
 volumes:
   portainer_data:
 networks:

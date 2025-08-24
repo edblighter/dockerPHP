@@ -16,7 +16,7 @@ APP_NGINX_CONTAINER_NAME=app_nginx  # Container running the Nginx web server (De
 APP_CADDY_CONTAINER_NAME=app_caddy  # Container running the Caddy web server (Default to HTTP_PORT = 8000 and HTTPS available)
 
 # MISC TOOLS
-APP_MAILPIT_CONTAINER=app_mailpit   # Container running the Mailpit instance to simulate SMTP sends (Default address http://smtp.localhost:8000)
+APP_MAILPIT_CONTAINER=app_mailpit   # Container running the Mailpit instance to simulate SMTP sends (Default address http://mailpit.localhost:8025)
 APP_PORTAINER_CONTAINER_NAME=app_manager
 APP_TRAEFIK_CONTAINER_NAME=app_traefik
 
@@ -32,8 +32,8 @@ APP_HTTPS_PORT=443 # Default port to be used for https access(if your port 443 i
 MYSQL_PORT=3306     # Default mysql/mariadb port
 POSTGRES_PORT=5432  # Default postgresql port
 APP_REDIS_PORT=6379 # Defaul redis port
-APP_MAILPIT_SMTP_PORT=1025  # Default smtp port to send emails to mailpit
-APP_MAILPIT_WEB_PORT=8025   # Default port to access the mailpit UI
+MAILPIT_PORT_SMTP=1025  # Default smtp port to send emails to mailpit
+MAILPIT_PORT_UI=8025   # Default port to access the mailpit UI
 
 # MISC
 APP_TIMEZONE="America/Manaus"       # Define the a timezone to adjust de date/time of logs inside containers
@@ -47,9 +47,11 @@ APP_DATABASE_NAME=laravel   # Database created at start of the database containe
 # PHP ENV
 PHP_VERSION=8.4        # Supported Versions [8.4, 8.3, 8.2, 7.4, 5.6]
 PHP_VARIANT=.alpine  # Supported Variants [.alpine, .distro, .debian] only for PHP 8.4, leave '' for other versions
+PHP_MEM_LIMIT=1G  # Memory limit for the php container
 # MYSQL ENV
 MYSQL_IMAGE=mysql
 MYSQL_VERSION=lts      # RECOMMENDED TAGS[latest, lts, 5.7]
+MYSQL_MEM_LIMIT=1G  # Memory limit for the mysql container
 # MARIADB
 MARIADB_IMAGE=mariadb
 MARIADB_VERSION=lts      # RECOMMENDED TAGS[latest, lts, 10]
@@ -64,13 +66,14 @@ PHPMYADMIN_IMAGE=phpmyadmin     # RECOMMENDED IMAGE [phpmyadmin, phpmyadmin/phpm
 PHPMYADMIN_VERSION=latest   # RECOMMENDED TAGS[latest, fpm-alpine]
 PHPMYADMIN_URL="http://dbadmin.localhost/"
 PHPMYADMIN_ARBITRARY=0      # If this value is 1 then the system will ask for the credentials
-
+PHPMYADMIN_MEM_LIMIT=128M  # Memory limit for the phpmyadmin container
 # POSTGRES ENV
 POSTGRES_IMAGE=postgres
 POSTGRES_VERSION=alpine       # RECOMMENDED TAGS[latest, alpine, 16-bookwom, 16-alpine, 15-bookworm, 15-alpine, 14-bookworm, 14-alpine, 13-bookworm, 13-alpine]
 APP_POSTGRES_USER=laravel
 APP_POSTGRES_PASSWORD=secret
 POSTGRESDATA_PATH="$PWD/docker-data/postgres/data"
+POSTGRES_MEM_LIMIT=1G  # Memory limit for the postgres container
 
 # DBADMIN
 ADMINER_IMAGE=wodby/adminer
@@ -85,11 +88,11 @@ REDIS_MEM_LIMIT=500M
 # MAILPIT ENV
 MAILPIT_IMAGE=axllent/mailpit
 MAILPIT_VERSION=latest  # RECOMMENDED TAGS[latest]
-
+MAILPIT_MEM_LIMIT=128M
 # NGINX ENV
 NGINX_IMAGE=nginx
 NGINX_VERSION=stable-alpine    # RECOMMENDED TAGS[latest, alpine, stable-bookworm, stable-alpine]
-
+NGINX_MEM_LIMIT=256M  # Memory limit for the nginx container
 # CADDY ENV
 CADDY_IMAGE=caddy
 CADDY_VERSION=alpine    # RECOMMENDED TAGS[latest, alpine]
@@ -98,7 +101,9 @@ CADDY_MEM_LIMIT=300M
 # PORTAINER ENV
 PORTAINER_IMAGE=portainer/portainer-ce
 PORTAINER_VERSION=latest
+PORTAINER_MEM_LIMIT=256M  # Memory limit for the portainer container
 
 # TRAEFIK ENV
 TRAEFIK_IMAGE=traefik
 TRAEFIK_VERSION=latest  # RECOMMENDED TAGS [latest, v2]
+TRAEFIK_MEM_LIMIT=256M

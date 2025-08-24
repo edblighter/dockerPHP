@@ -21,6 +21,8 @@ services:
       - ${APP_NETWORK_NAME:-app_network}
     cap_add:
       - NET_ADMIN
+    mem_reservation: "50M"
+    mem_limit: "${TRAEFIK_MEM_LIMIT:-256M}"
 networks:
   app_network:
     name: ${APP_NETWORK_NAME:-app_network}
