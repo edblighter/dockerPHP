@@ -10,7 +10,7 @@ services:
       file: ./services/traefik/docker-compose.yml
       service: proxy
   mailpit:
-    container_name: ${APP_MAILpit_CONTAINER:-tools_mailpit}
+    container_name: ${APP_MAILPIT_CONTAINER:-tools_mailpit}
     extends:
       file: ./services/mailpit/docker-compose.yml
       service: smtp
