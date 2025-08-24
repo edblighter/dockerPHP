@@ -15,11 +15,17 @@
 x-nginx-traefik: &labels-traefik-nginx
   labels:
     - "traefik.enable=true"
-    - "traefik.http.routers.nginx.entrypoints=web,secure-web"
+    - "traefik.http.routers.nginx.entrypoints=web"
     - "traefik.http.routers.nginx.rule=HostRegexp(`.+`)"
     - "traefik.http.routers.nginx.priority=1"
     - "traefik.http.routers.nginx.service=nginx"
-    - "traefik.http.services.nginx.loadbalancer.server.port=80"
+    - "traefik.http.services.nginx.loadbalancer.server.port=80" # Port where Nginx is listening inside the container
+    # HTTPS
+    - "traefik.tcp.routers.nginx-secure.entrypoints=secure-web"
+    - "traefik.tcp.routers.nginx-secure.rule=HostSNI(`*`)"
+    - "traefik.tcp.routers.nginx-secure.priority=1"
+    - "traefik.tcp.services.nginx-secure.loadbalancer.server.port=443"     # Traefik rule for HTTPS (port 443)
+
 services:
   web:
     image: ${NGINX_IMAGE:-nginx}:${NGINX_VERSION:-alpine}
@@ -47,6 +53,8 @@ services:
     expose:
       - 80
       - 443
+    mem_reservation: 50M
+    mem_limit: ${NGINX_MEM_LIMIT:-256M}
 volumes:
   app_volume:
     name: app_volume

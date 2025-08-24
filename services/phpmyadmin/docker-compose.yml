@@ -45,6 +45,8 @@ services:
       - 9000
     networks:
       - ${APP_NETWORK_NAME:-app_network}
+    mem_reservation: 50M
+    mem_limit: ${PHPMYADMIN_MEM_LIMIT:-128M}
 networks:
   app_network:
     name: ${APP_NETWORK_NAME:-app_network}

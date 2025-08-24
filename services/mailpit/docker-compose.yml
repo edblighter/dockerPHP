@@ -5,9 +5,6 @@
 x-mailpit-traefik: &labels-traefik-mailpit
   labels:
     - "traefik.enable=true"
-#    - "traefik.http.routers.smtp.rule=Host(`smtp.localhost`)"
-#    - "traefik.http.routers.smtp.entrypoints=web"
-#    - "traefik.http.services.smtp.loadbalancer.server.port=8025"
     - "traefik.tcp.routers.smtp.entrypoints=smtp"
     - "traefik.tcp.services.smtp.loadbalancer.server.port=1025"
 services:
@@ -30,13 +27,15 @@ services:
       MP_SMTP_AUTH_ACCEPT_ANY: true
       MP_SMTP_AUTH_ALLOW_INSECURE: true
     ports:
-      - ${APP_MAILPIT_SMTP_PORT:-1025}:1025
-      - ${APP_MAILPIT_WEB_PORT:-8025}:8025
+      - ${MAILPIT_PORT_SMTP:-1025}:1025
+      - ${MAILPIT_PORT_UI:-8025}:8025
     networks:
       - ${APP_NETWORK_NAME:-app_network}
     expose:
       - 1025
       - 8025
+    mem_reservation: 15M
+    mem_limit: ${MAILPIT_MEM_LIMIT:-128M}
 networks:
   app_network:
     name: ${APP_NETWORK_NAME:-app_network}

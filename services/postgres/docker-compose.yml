@@ -46,6 +46,8 @@ services:
       #- $PWD/docker-data/postgres/logs:/tmp/logs   # TODO: Expose the logs(First attempt run in permission issues)
     networks:
       - ${APP_NETWORK_NAME:-app_network}
+    mem_reservation: 400M
+    mem_limit: ${POSTGRES_MEM_LIMIT:-1G}
   dbadmin:
     extends:
       file: $PWD/services/adminer/docker-compose.yml

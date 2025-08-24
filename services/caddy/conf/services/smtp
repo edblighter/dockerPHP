@@ -1,1 +1,1 @@
-import proxypass smtp.localhost smtp:8025
+import proxypass smtp.localhost mailpit:8025

@@ -16,6 +16,20 @@
 # at snippets
 #
 
+x-caddy-traefik: &labels-traefik-caddy
+  labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.caddy.entrypoints=web"
+    - "traefik.http.routers.caddy.rule=HostRegexp(`.+`)"
+    - "traefik.http.routers.caddy.priority=1"
+    - "traefik.http.routers.caddy.service=caddy"
+    - "traefik.http.services.caddy.loadbalancer.server.port=80" # Port where caddy is listening inside the container
+    # HTTPS
+    - "traefik.tcp.routers.caddy-secure.entrypoints=secure-web"
+    - "traefik.tcp.routers.caddy-secure.rule=HostSNI(`*`)"
+    - "traefik.tcp.routers.caddy-secure.priority=2"
+    - "traefik.tcp.services.caddy-secure.loadbalancer.server.port=443"     # Traefik rule for HTTPS (port 443)
+
 services:
   web:
     image: ${CADDY_IMAGE:-caddy}:${CADDY_VERSION:-alpine}
@@ -27,6 +41,7 @@ services:
       timeout: 10s
       retries: 2
       start_period: 0s
+    <<: *labels-traefik-caddy
     volumes:
       - $PWD/services/caddy/conf/CaddyFile:/etc/caddy/Caddyfile:ro
       - $PWD/services/caddy/conf/services/:/etc/caddy/services/

@@ -47,6 +47,8 @@ services:
       - $PWD/services/mysql/conf/my.cnf:/etc/my.cnf
     networks:
       - ${APP_NETWORK_NAME:-app_network}
+    mem_reservation: 500M
+    mem_limit: ${MYSQL_MEM_LIMIT:-1G}
   dbadmin:
     extends:
       file: $PWD/services/phpmyadmin/docker-compose.yml

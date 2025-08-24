@@ -1,8 +1,8 @@
 # Docker Setup for PHP Development
 
-Complete Docker environment for PHP(Original project intended for Laravel) development, including support for multiple databases, web servers, and auxiliary services.
+Complete Docker environment for PHP development, including support for multiple databases, web servers, and auxiliary services.
 
-> Também disponível em [pt_BR](./README.pt_BR.md)
+> Also available in [pt_BR](./README.pt_BR.md)
 
 ---
 
@@ -12,7 +12,7 @@ Complete Docker environment for PHP(Original project intended for Laravel) devel
 - **MySQL/MariaDB and PHPMyAdmin** - The variant can be chosen at startup and versions can be altered via env variable.
 - **PostgreSQL and Adminer** - Multiple versions of the PostgreSQL available via env variables.
 - **Redis** 
-- **MailHog**
+- **Mailpit**
 
 ---
 
@@ -51,7 +51,7 @@ Choose the web server (**nginx** or **caddy**) and the database (**mysql**, **ma
 ```bash
 ./run.sh caddy mysql up
 ```
-> This command will create the containers: **app_php**, **app_caddy**, **app_redis**, **app_mysql**, **app_mailhog**, **app_phpmyadmin**; along with the volume **redis_cache** and the network **app_network**.
+> This command will create the containers: **app_php**, **app_caddy**, **app_redis**, **app_mysql**, **app_mailpit**, **app_phpmyadmin**; along with the volume **redis_cache** and the network **app_network**.
 
 at the end of the boot process you can test the web server at
 
@@ -80,6 +80,6 @@ sudo docker exec <container_name> <command>
 
 - **DBAdmin**: [http://dbadmin.localhost:8000](http://dbadmin.localhost:8000) _(phpMyAdmin for MySQL/MariaDB or Adminer for PostgreSQL)_
 
-- **MailHog**: [http://mailhog.localhost:8000](http://mailhog.localhost:8000)
+- **Mailpit**: [http://mailpit.localhost:8025](http://mailpit.localhost:8025)
 
 ---
