@@ -1,5 +1,7 @@
 teste
 app
+project
+*.tar.gz
 .bash_history
 .composer
 .mysql_history

@@ -46,7 +46,8 @@ APP_DATABASE_NAME=laravel   # Database created at start of the database containe
 
 # PHP ENV
 PHP_VERSION=8.4        # Supported Versions [8.4, 8.3, 8.2, 7.4, 5.6]
-PHP_VARIANT=.alpine  # Supported Variants [.alpine, .distro, .debian] only for PHP 8.4, leave '' for other versions
+# Supported Variants [.alpine, .distro, .debian] only for PHP 8.4, leave '' for other versions
+PHP_VARIANT=.alpine
 PHP_MEM_LIMIT=1G  # Memory limit for the php container
 # MYSQL ENV
 MYSQL_IMAGE=mysql

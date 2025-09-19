@@ -19,7 +19,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: $PWD/services/php/versions/Dockerfile.php${PHP_VERSION:-8.4}-fpm${PHP_VARIANT:-.alpine}
+      dockerfile: $PWD/services/php/versions/Dockerfile.php${PHP_VERSION:-8.4}-fpm${PHP_VARIANT}
     container_name: ${APP_CONTAINER_NAME:-app_php}
     user: 1000:1000
     working_dir: /var/www
