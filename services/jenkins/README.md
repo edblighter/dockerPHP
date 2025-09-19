@@ -1,71 +1,48 @@
 # Jenkins Service
 
-This service provides a powerful and extensible automation server called [Jenkins](https://www.jenkins.io/). It's a leading open-source tool for building, testing, and deploying software, enabling continuous integration and continuous delivery (CI/CD) pipelines.
+## Overview
+This service provides [Jenkins](https://www.jenkins.io/), a powerful, extensible automation server for CI/CD pipelines, building, testing, and deploying software.
 
-## Key Features
+## Features
+- **CI/CD Automation:** Automate development lifecycle from build to deployment.
+- **Plugin Ecosystem:** Thousands of plugins for integrations.
+- **Distributed Builds:** Scale builds across multiple agents.
+- **Pipeline as Code:** Define pipelines with Jenkinsfile.
 
-- **CI/CD Automation:** Automate your software development lifecycle, from building and testing to deployment and delivery.
-- **Extensive Plugin Ecosystem:** With thousands of available plugins, Jenkins can be integrated with a wide range of tools and technologies.
-- **Distributed Builds:** Distribute build and test workloads across multiple machines for faster and more efficient pipelines.
+## Prerequisites
+- Docker and Docker Compose installed.
+- Sufficient resources for builds.
 
-## Standalone Usage
+## Quick Start
+1. Run: `docker-compose -f services/jenkins/docker-compose.yml up -d`
+2. Access at `http://127.0.0.1:8085`
+3. Complete initial setup and unlock with admin password from logs.
 
-To run the Jenkins service as a standalone container, execute the following command from the project's root directory:
+## Configuration
+Customize via environment variables or `.env.jenkins`:
 
-```bash
-docker-compose -f services/jenkins/docker-compose.yml up -d
-```
+| Variable               | Description                                       | Default Value    |
+| ---------------------- | ------------------------------------------------- | ---------------- |
+| `JENKINS_CONTAINER_NAME` | The name of the Jenkins container.               | `jenkins`        |
+| `JENKINS_IMAGE`        | The Docker image for Jenkins.                     | `jenkins/jenkins`|
+| `JENKINS_VERSION`      | The version of the Jenkins image.                 | `lts`            |
+| `JENKINS_HTTP_PORT`    | The HTTP port for Jenkins.                        | `8085`           |
+| `JENKINS_AGENT_PORT`   | The port for Jenkins agents.                      | `50000`          |
+| `JENKINS_DATA_DIR`     | The directory for Jenkins data.                   | `./jenkins_data` |
 
-This will start the Jenkins container with the default configuration values.
+## Usage
+- **Web UI:** Manage jobs, plugins, and configurations.
+- **Pipelines:** Create freestyle or pipeline jobs.
+- **Agents:** Connect build agents for distributed builds.
+- **Plugins:** Install plugins for Git, Docker, etc.
+- **Security:** Configure users, roles, and credentials.
 
-### Customization
+## Troubleshooting
+- **Unlock Password:** Check logs with `docker logs <container>` for initial password.
+- **Permission Issues:** Ensure Docker socket access for Docker builds.
+- **Memory/CPU:** Increase limits if builds fail due to resources.
+- **Plugin Errors:** Check plugin compatibility and update Jenkins.
 
-For advanced customization, it is recommended to use environment variables. You can create a `.env.jenkins` file with the following content:
-
-```
-JENKINS_IMAGE=jenkins/jenkins
-JENKINS_VERSION=lts
-JENKINS_CONTAINER_NAME=jenkins
-JENKINS_HTTP_PORT=8085
-JENKINS_AGENT_PORT=50000
-JENKINS_DATA_DIR=./jenkins_data
-```
-
-Then, update the `docker-compose.yml` to use these variables:
-
-```yaml
-services:
-  jenkins:
-    image: ${JENKINS_IMAGE:-jenkins/jenkins}:${JENKINS_VERSION:-lts}
-    container_name: ${JENKINS_CONTAINER_NAME:-jenkins}
-    restart: unless-stopped
-    privileged: true
-    user: root
-    ports:
-      - "${JENKINS_HTTP_PORT:-8085}:8080"
-      - "${JENKINS_AGENT_PORT:-50000}:50000"
-    volumes:
-      - ${JENKINS_DATA_DIR:-./jenkins_data}:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - jenkins_network
-networks:
-  jenkins_network:
-    driver: bridge
-```
-
-### Healthcheck
-
-To ensure the container is running correctly, you can add a healthcheck to the service in the `docker-compose.yml` file:
-
-```yaml
-healthcheck:
-  test: ["CMD", "curl", "-f", "http://localhost:8080/login"]
-  interval: 10s
-  timeout: 5s
-  retries: 5
-```
-
-### Accessing Jenkins
-
-Once the service is running, you can access the Jenkins web interface at `http://127.0.0.1:8085`.
+## Links
+- [Jenkins Documentation](https://www.jenkins.io/doc/)
+- [Pipeline Syntax](https://www.jenkins.io/doc/book/pipeline/syntax/)

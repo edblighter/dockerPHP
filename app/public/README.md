@@ -1,8 +1,6 @@
 # About this folder
 
-This folder is just a sample of what an web server can offer.
+This folder contains sample files to test the web server.
 
-The root http://info.localhost:8000 contains a directory index provided by caddy or nginx.
-
-You can type http://info.localhost:8000/static for a static html page 
-or http://info.localhost:8000/php for a phpinfo(). 
+- **http://info.localhost:8000/** (or `https://info.localhost` with Caddy) serves the `index.static.html` file.
+- **http://info.localhost:8000/index.php** (or `https://info.localhost/index.php` with Caddy) executes the `index.php` file, which displays the output of `phpinfo()`.
