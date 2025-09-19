@@ -1,47 +1,48 @@
 # Adminer Service
 
-This service provides a lightweight and user-friendly database management tool called [Adminer](https://www.adminer.org/). It's a single PHP file that offers a full-featured alternative to phpMyAdmin.
+## Overview
+This service provides [Adminer](https://www.adminer.org/), a lightweight, user-friendly database management tool that's a single PHP file alternative to phpMyAdmin.
 
-## Key Features
+## Features
+- **Simplicity:** Clean, intuitive interface for easy deployment.
+- **Multi-Database Support:** Connects to MySQL, MariaDB, PostgreSQL, SQLite, MS SQL, Oracle, etc.
+- **Security:** Built-in protection against SQL injection, XSS, and CSRF.
+- **Single File:** No complex installation required.
 
-- **Simplicity:** Easy to deploy and use, with a clean and intuitive interface.
-- **Wide Database Support:** Connect to various database systems, including MySQL, MariaDB, PostgreSQL, SQLite, MS SQL, Oracle, and more.
-- **Security:** Built-in protection against common web vulnerabilities like SQL injection, XSS, and CSRF.
+## Prerequisites
+- Docker and Docker Compose installed.
+- Database service running for connection.
 
-## Standalone Usage
+## Quick Start
+1. Run: `docker-compose -f services/adminer/docker-compose.yml up -d`
+2. Access at `http://dbadmin.localhost:8000` (with proxy) or standalone port.
 
-To run the Adminer service as a standalone container, execute the following command from the project's root directory:
-
-```bash
-docker-compose -f services/adminer/docker-compose.yml up -d
-```
-
-This will start the Adminer container with the default configuration values.
-
-### Customization
-
-For advanced customization, you can use the `.env.adminer` file. To apply your custom settings, run the following command:
-
-```bash
-docker-compose -f services/adminer/docker-compose.yml --env-file services/adminer/.env.adminer up -d
-```
-
-The following variables can be customized in the `.env.adminer` file:
+## Configuration
+Customize via `.env.adminer`:
 
 | Variable                  | Description                                       | Default Value     |
 | ------------------------- | ------------------------------------------------- | ----------------- |
-| `ADMINER_EXTERNAL_PORT`   | The external port to access Adminer.              | `8088`            |
 | `DBADMIN_CONTAINER_NAME`  | The name of the Adminer container.                | `app_dbadmin`     |
-| `DB_HOST`                 | The hostname of the database server.              | `db`              |
 | `ADMINER_IMAGE`           | The Docker image for Adminer.                     | `wodby/adminer`   |
 | `ADMINER_VERSION`         | The version of the Adminer image.                 | `latest`          |
+| `ADMINER_EXTERNAL_PORT`   | The external port to access Adminer.              | `8088`            |
 | `ADMINER_DEFAULT_DRIVER`  | The default database driver to use.               | `pgsql`           |
+| `DB_HOST`                 | The hostname of the database server.              | `db`              |
 | `APP_DATABASE_NAME`       | The name of the database to connect to.           | `laravel`         |
 | `APP_NETWORK_NAME`        | The name of the Docker network.                   | `app_network`     |
 
-### Accessing Adminer
+## Usage
+- **Access:** Web interface at configured URL.
+- **Connection:** Use database credentials to connect.
+- **Features:** Browse tables, run queries, manage data.
+- **Drivers:** Supports multiple database drivers.
 
-Once the service is running, you can access the Adminer web interface through the following URLs:
+## Troubleshooting
+- **Connection Failed:** Ensure database service is running and credentials are correct.
+- **Port Issues:** Check if `ADMINER_EXTERNAL_PORT` is available.
+- **Driver Mismatch:** Set `ADMINER_DEFAULT_DRIVER` to match your database (e.g., `mysql` for MySQL).
+- **Access Denied:** Verify network and firewall settings.
 
-- **Standalone:** `http://127.0.0.1:8088`
-- **With Proxy:** `http://dbadmin.localhost:8000` (requires the proxy service to be running)
+## Links
+- [Adminer Documentation](https://www.adminer.org/en/)
+- [Supported Databases](https://www.adminer.org/en/drivers/)

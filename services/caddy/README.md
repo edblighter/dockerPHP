@@ -1,46 +1,50 @@
 # Caddy Service
 
-This service provides a powerful and easy-to-use web server called [Caddy](https://caddyserver.com/). It's a modern, open-source web server with automatic HTTPS, making it an excellent choice for secure and efficient web hosting.
+## Overview
+This service provides [Caddy](https://caddyserver.com/), a modern, open-source web server with automatic HTTPS. It's designed for simplicity and security in web hosting.
 
-## Key Features
+## Features
+- **Automatic HTTPS:** Zero-config SSL/TLS certificates via Let's Encrypt.
+- **Simple Config:** Human-readable Caddyfile syntax.
+- **Extensible:** Plugin system for additional features.
+- **Reverse Proxy:** Built-in support for proxying to backend services.
 
-- **Automatic HTTPS:** Caddy automatically enables HTTPS for your sites, ensuring secure connections without the hassle of manual certificate management.
-- **Simple Configuration:** With a human-readable Caddyfile, configuring your web server is straightforward and intuitive.
-- **Extensible:** Caddy can be extended with a variety of plugins to add new features and functionality.
+## Prerequisites
+- Docker and Docker Compose installed.
+- Ports 80 and 443 available for HTTP/HTTPS.
+- Domain name for automatic HTTPS (optional).
 
-## Standalone Usage
+## Quick Start
+1. Run: `docker-compose -f services/caddy/docker-compose.yml up -d`
+2. Access at `https://info.localhost` (ignore self-signed cert warning).
 
-To run the Caddy service as a standalone container, execute the following command from the project's root directory:
-
-```bash
-docker-compose -f services/caddy/docker-compose.yml up -d
-```
-
-This will start the Caddy container with the default configuration values.
-
-### Customization
-
-For advanced customization, you can use the `.env.caddy` file. To apply your custom settings, run the following command:
-
-```bash
-docker-compose -f services/caddy/docker-compose.yml --env-file services/caddy/.env.caddy up -d
-```
-
-The following variables can be customized in the `.env.caddy` file:
+## Configuration
+Customize via `.env.caddy`:
 
 | Variable                   | Description                                       | Default Value       |
 | -------------------------- | ------------------------------------------------- | ------------------- |
+| `APP_CADDY_CONTAINER_NAME` | The name of the Caddy container.                  | `app_caddy`         |
 | `CADDY_IMAGE`              | The Docker image for Caddy.                       | `caddy`             |
 | `CADDY_VERSION`            | The version of the Caddy image.                   | `alpine`            |
-| `APP_CADDY_CONTAINER_NAME` | The name of the Caddy container.                  | `app_caddy`         |
 | `CADDY_MEM_LIMIT`          | The memory limit for the Caddy container.         | `300M`              |
 | `APP_HTTP_PORT`            | The HTTP port for Caddy.                          | `8000`              |
 | `APP_HTTPS_PORT`           | The HTTPS port for Caddy.                         | `443`               |
 | `APP_TIMEZONE`             | The timezone for the container.                   | `America/Manaus`    |
 | `APP_NETWORK_NAME`         | The name of the Docker network.                   | `app_network`       |
 
-### Configuration
+## Usage
+- **Caddyfile:** Main config in `services/caddy/conf/Caddyfile`.
+- **Sites:** Virtual hosts in `services/caddy/conf/sites/`.
+- **Snippets:** Reusable configs in `services/caddy/conf/snippets/`.
+- **Mount Point:** `/srv` maps to host `app` folder.
+- **Logs:** View with `docker logs app_caddy`.
 
-The Caddy configuration is managed through the `Caddyfile` located in `services/caddy/conf/`. You can also create virtual hosts in the `services/caddy/conf/sites/` directory and use snippets from `services/caddy/conf/snippets/`.
+## Troubleshooting
+- **HTTPS Issues:** Add `{ auto_https off }` to Caddyfile for local dev.
+- **Port Conflicts:** Ensure 80/443 are free or change ports.
+- **Config Errors:** Validate Caddyfile syntax.
+- **Permissions:** Check file permissions in mounted directories.
 
-To disable the automatic HTTPS redirect, you can add `{ auto_https off }` at the beginning of the `Caddyfile`.
+## Links
+- [Caddy Documentation](https://caddyserver.com/docs/)
+- [Caddyfile Syntax](https://caddyserver.com/docs/caddyfile)

@@ -1,83 +1,159 @@
 # Configuração Docker para Desenvolvimento PHP
 
-Ambiente Docker completo para desenvolvimento PHP, incluindo suporte a múltiplos bancos de dados, servidores web e serviços auxiliares.
+Um ambiente Docker completo para desenvolvimento PHP local, oferecendo uma seleção de servidores web, bancos de dados e ferramentas de desenvolvimento essenciais.
 
-> Also available in [EN](./README.md)
-
----
-
-## 🔧 Serviços Disponíveis
-
-- **PHP-FPM** - Versões [8.4, 8.3, 8.2, 7.4 e 5.6] disponíveis com módulos comuns embutidos e ferramentas como Bun e Composer.
-- **MySQL/MariaDB e PHPMyAdmin** - A variante pode ser escolhida na inicialização e as versões podem ser alteradas via variável de ambiente.
-- **PostgreSQL e Adminer** - Múltiplas versões do PostgreSQL disponíveis via variáveis de ambiente.
-- **Redis**
-- **Mailpit**
+> Também disponível em [EN](./README.md)
 
 ---
 
-## 🌐 Servidores Web Disponíveis
+## Funcionalidades
 
-Escolha entre:
-
-- **Nginx** – leve e amplamente utilizado
-- **Caddy** – com suporte a SSL local automático (autoassinado)
+- **Múltiplas Versões do PHP:** Alterne entre PHP 5.6, 7.4, 8.2, 8.3 e 8.4.
+- **Servidores Web Flexíveis:** Escolha entre Nginx (padrão) ou Caddy com HTTPS automático.
+- **Variedade de Bancos de Dados:** Suporta MySQL (padrão), MariaDB e PostgreSQL.
+- **Ferramentas Essenciais:** Inclui Redis para cache e Mailpit para teste de e-mails.
+- **Gerenciamento Fácil:** Use `run.sh` para operações de linha de comando ou `menu.sh` para uma experiência interativa.
+- **Serviços Auxiliares:** Inclui serviços opcionais como Portainer, Traefik e Jenkins para gerenciamento avançado e CI/CD.
 
 ---
 
 ## ✅ Requisitos
 
-Certifique-se de que os seguintes softwares estão instalados:
-
-- `sudo`
 - [Docker](https://docs.docker.com/engine/install/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
-
-## Antes de começar
-
-A pasta `app` será montada como:
-
-- `/var/www` (para Nginx)
-- `/srv` (para Caddy)
-
-Ela já contém a pasta `public` com um `index.html` e um `index.php` para testar o servidor web após a inicialização.
+- Permissões de `sudo`
 
 ---
 
-## 📦 Comandos para Executar
+## 🚀 Início Rápido
 
-Escolha o servidor web (**nginx** ou **caddy**) e o banco de dados (**mysql**, **mariadb** ou **postgres**) para iniciar os serviços:
+1.  **Clone o repositório e navegue para o diretório do projeto.**
 
+2.  **Coloque os arquivos do seu projeto PHP no diretório `app/`.**
+    O diretório `app/` é montado como a raiz do servidor web:
+    - Nginx: `/var/www`
+    - Caddy: `/srv`
+
+3.  **Execute o menu de configuração interativo:**
+    ```bash
+    ./menu.sh
+    ```
+    Alternativamente, use o script `run.sh` para uma configuração não interativa. Por exemplo, para iniciar com Nginx e MySQL:
+    ```bash
+    ./run.sh -w nginx -d mysql up
+    ```
+
+4.  **Acesse sua aplicação:**
+    - **Nginx:** [http://info.localhost:8000](http://info.localhost:8000)
+    - **Caddy:** [https://info.localhost](https://info.localhost) (ignore o aviso de certificado autoassinado)
+
+---
+
+## 📦 Uso
+
+Este ambiente é gerenciado por dois scripts principais: `run.sh` e `menu.sh`.
+
+### Menu Interativo (`menu.sh`)
+
+Para uma configuração guiada, simplesmente execute:
 ```bash
-./run.sh caddy mysql up
+./menu.sh
 ```
-> Este comando criará os containers: **app_php**, **app_caddy**, **app_redis**, **app_mysql**, **app_mailpit**, **app_phpmyadmin**; juntamente com o volume **redis_cache** e a rede **app_network**.
+Este script irá guiá-lo na seleção de um servidor web, banco de dados e outras opções.
 
-Ao final do processo de inicialização, você pode testar o servidor web em:
+### Script de Linha de Comando (`run.sh`)
 
-- **Nginx**: [http://info.localhost:8000](http://info.localhost:8000)
-- **Caddy**: [https://info.localhost](https://info.localhost) _(ignore o aviso de segurança — é comum com certificados autoassinados)_
+O script `run.sh` fornece uma maneira direta de gerenciar o ambiente.
 
-Para remover os serviços, execute:
-
+**Sintaxe:**
 ```bash
-./run.sh caddy mysql down
-# ou
-./run.sh clear  # isso removerá todos os containers com valor padrão e perguntará se deseja limpar o cache.
+./run.sh [opções] [comando]
 ```
 
-> 💡 Os comandos Docker usam `sudo` por padrão. Para executar comandos dentro dos containers, use:
+**Opções:**
+| Opção | Descrição | Padrão |
+|---|---|---|
+| `-w`, `--web <servidor>` | Escolha um servidor web (`nginx` ou `caddy`). | `nginx` |
+| `-d`, `--database <db>` | Escolha um banco de dados (`mysql`, `mariadb`, ou `postgres`). | `mysql` |
+| `-H`, `--help` | Exibe a tela de ajuda. | |
 
+**Comandos:**
+| Comando | Descrição |
+|---|---|
+| `up` | Inicia e constrói os serviços. |
+| `down` | Para os serviços. |
+| `clear` | Para e remove todos os contêineres, volumes e dados. **Aviso: Esta ação é destrutiva.** |
+
+**Exemplos:**
 ```bash
-sudo docker exec <nome_do_container> <comando>
+# Iniciar com Nginx e MySQL
+./run.sh -w nginx -d mysql up
+
+# Parar o ambiente
+./run.sh down
+
+# Limpar todo o ambiente
+./run.sh clear
 ```
 
 ---
 
-## 🧪 Ferramentas Auxiliares
+## 🔧 Serviços
 
-- **DBAdmin**: [http://dbadmin.localhost:8000](http://dbadmin.localhost:8000) _(phpMyAdmin para MySQL/MariaDB ou Adminer para PostgreSQL)_
+Esta configuração inclui uma variedade de serviços que podem ser combinados para atender às suas necessidades.
 
-- **Mailpit**: [http://mailpit.localhost:8025](http://mailpit.localhost:8025)
+### Serviços Principais
+| Serviço | Descrição |
+|---|---|
+| **PHP-FPM** | Interpretador PHP com versões de 5.6 a 8.4. |
+| **Servidor Web** | Nginx ou Caddy. |
+| **Banco de Dados** | MySQL, MariaDB ou PostgreSQL. |
+| **Redis** | Armazenamento de dados em memória para cache. |
+| **Mailpit** | Ferramenta de teste de e-mail. |
+
+### Ferramentas Auxiliares
+Estes serviços são opcionais e podem ser iniciados independentemente.
+
+| Serviço | Descrição | Acesso |
+|---|---|---|
+| **DBAdmin** | phpMyAdmin para MySQL/MariaDB ou Adminer para PostgreSQL. | [http://dbadmin.localhost:8000](http://dbadmin.localhost:8000) |
+| **Portainer** | UI de gerenciamento do Docker. | [http://manager.localhost:9000](http://manager.localhost:9000) |
+| **Traefik** | Proxy reverso e balanceador de carga. | [http://localhost:8080](http://localhost:8080) (Dashboard) |
+| **Jenkins** | Servidor de automação de CI/CD. | [http://localhost:8085](http://localhost:8085) |
 
 ---
+
+## 📚 Documentação dos Serviços
+
+Para informações detalhadas sobre cada serviço, incluindo configuração e uso avançado, consulte os respectivos arquivos `README.md`:
+
+- [PHP](./services/php/README.md)
+- [Nginx](./services/nginx/README.md)
+- [Caddy](./services/caddy/README.md)
+- [MySQL](./services/mysql/README.md)
+- [MariaDB](./services/mariadb/README.md)
+- [PostgreSQL](./services/postgres/README.md)
+- [Redis](./services/redis/README.md)
+- [Mailpit](./services/mailpit/README.md)
+- [PHPMyAdmin](./services/phpmyadmin/README.md)
+- [Adminer](./services/adminer/README.md)
+- [Portainer](./services/portainer/README.md)
+- [Traefik](./services/traefik/README.md)
+- [Jenkins](./services/jenkins/README.md)
+
+---
+
+## ⚙️ Configuração
+
+- **Variáveis de Ambiente:** Personalize versões, portas e outras configurações em `.env.app`.
+- **Configuração do PHP:** Ajuste as configurações do PHP em `services/php/conf/php.ini` e `www.conf`.
+- **Configuração dos Serviços:** Modifique os arquivos `docker-compose.yml` e os arquivos `.env` dentro do diretório de cada serviço para alterações mais avançadas.
+
+---
+
+## 💡 Solução de Problemas
+
+- **Conflitos de Porta:** Se um serviço não iniciar, verifique se as portas necessárias já estão em uso. Você pode alterar as portas nos arquivos `.env` correspondentes.
+- **Erros de Permissão:** Certifique-se de que o usuário que executa os comandos do Docker tenha as permissões necessárias para acessar o daemon do Docker e os arquivos do projeto.
+- **Logs:** Para inspecionar os logs de um contêiner específico, use `docker logs <nome_do_container>`.
+- **Resetando o Ambiente:** Se encontrar problemas persistentes, você pode resetar todo o ambiente com `./run.sh clear`. **Aviso: Isso excluirá todos os dados.**
