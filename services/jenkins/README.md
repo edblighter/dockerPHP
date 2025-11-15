@@ -19,16 +19,16 @@ This service provides [Jenkins](https://www.jenkins.io/), a powerful, extensible
 3. Complete initial setup and unlock with admin password from logs.
 
 ## Configuration
-Customize via environment variables or `.env.jenkins`:
+Customize via environment variables in `.env.app`:
 
 | Variable               | Description                                       | Default Value    |
 | ---------------------- | ------------------------------------------------- | ---------------- |
-| `JENKINS_CONTAINER_NAME` | The name of the Jenkins container.               | `jenkins`        |
+| `JENKINS_CONTAINER_NAME` | The name of the Jenkins container.               | `tools_jenkins`  |
 | `JENKINS_IMAGE`        | The Docker image for Jenkins.                     | `jenkins/jenkins`|
 | `JENKINS_VERSION`      | The version of the Jenkins image.                 | `lts`            |
-| `JENKINS_HTTP_PORT`    | The HTTP port for Jenkins.                        | `8085`           |
-| `JENKINS_AGENT_PORT`   | The port for Jenkins agents.                      | `50000`          |
-| `JENKINS_DATA_DIR`     | The directory for Jenkins data.                   | `./jenkins_data` |
+| `JENKINS_PORT`         | The HTTP port for Jenkins.                        | `8085`           |
+| `JENKINS_SLAVE_PORT`   | The port for Jenkins agents.                      | `50000`          |
+| `JENKINS_DATA_PATH`    | The directory for Jenkins data.                   | `$PWD/docker-data/jenkins/data` |
 
 ## Usage
 - **Web UI:** Manage jobs, plugins, and configurations.

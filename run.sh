@@ -18,13 +18,17 @@ APP_CONTAINERS=(
     app_php
     app_mysql
     app_postgres
+    app_mariadb
+    app_mongodb
+    app_duckdb
+    app_clickhouse
+    tools_jenkins
     app_redis
     app_phpmyadmin
     app_dbadmin
     app_nginx
     app_caddy
     app_mailpit
-    app_mariadb
 )
 APP_VOLUMES=(redis_cache app_volume)
 APP_NETWORK="app_network"
@@ -40,7 +44,7 @@ Docker Containers for web development.
 
 Options:
   -w, --web <server>      Choose a webserver (nginx or caddy). Default: ${WEBSERVER}
-  -d, --database <db>     Choose a database (mysql, mariadb, or postgres). Default: ${DATABASE}
+  -d, --database <db>     Choose a database (mysql, mariadb, postgres, mongodb, duckdb, or clickhouse). Default: ${DATABASE}
   -H, --help              Display this screen.
 
 Commands:
@@ -164,7 +168,7 @@ print_summary() {
     # Other services
     while IFS='=' read -r key value; do
         case "$key" in
-            REDIS_IMAGE|REDIS_VERSION|REDIS_MEM_LIMIT|MAILPIT_IMAGE|MAILPIT_VERSION|PORTAINER_IMAGE|PORTAINER_VERSION|TRAEFIK_IMAGE|TRAEFIK_VERSION)
+            JENKINS_IMAGE|JENKINS_VERSION|JENKINS_DATA_PATH|REDIS_IMAGE|REDIS_VERSION|REDIS_MEM_LIMIT|MAILPIT_IMAGE|MAILPIT_VERSION|PORTAINER_IMAGE|PORTAINER_VERSION|TRAEFIK_IMAGE|TRAEFIK_VERSION)
                 print_var "$key" "$value"
                 ;;
         esac
@@ -258,12 +262,12 @@ done
 case "${MODE}" in
     up)
         [[ "${WEBSERVER}" =~ ^(caddy|nginx)$ ]] || { echo "Invalid web server: ${WEBSERVER}"; usage; }
-        [[ "${DATABASE}" =~ ^(mysql|mariadb|postgres)$ ]] || { echo "Invalid database: ${DATABASE}"; usage; }
+        [[ "${DATABASE}" =~ ^(mysql|mariadb|postgres|mongodb|duckdb|clickhouse)$ ]] || { echo "Invalid database: ${DATABASE}"; usage; }
         run_up
         ;;
     down)
         [[ "${WEBSERVER}" =~ ^(caddy|nginx)$ ]] || { echo "Invalid web server: ${WEBSERVER}"; usage; }
-        [[ "${DATABASE}" =~ ^(mysql|mariadb|postgres)$ ]] || { echo "Invalid database: ${DATABASE}"; usage; }
+        [[ "${DATABASE}" =~ ^(mysql|mariadb|postgres|mongodb|duckdb|clickhouse)$ ]] || { echo "Invalid database: ${DATABASE}"; usage; }
         run_down
         ;;
     clear)

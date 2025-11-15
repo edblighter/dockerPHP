@@ -1,20 +1,38 @@
+# Container running the Jenkins
+# Note: The volumes at this container are refered at the root folder of the project.
+# Run the service at the root folder using the -f flag.
+# Ex: docker compose -f services/jenkins/docker-compose.yml --env-file .env.app up -d
+#
+# Default host port is 8085 and can be changed with the env variables.
+# The Jenkins default address is http://jenkins.localhost:8085
+#
+x-jenkins-traefik: &labels-traefik-jenkins
+  labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.jenkins.rule=Host(`jenkins.localhost`)"
+    - "traefik.http.routers.jenkins.entrypoints=web"
+    - "traefik.http.services.jenkins.loadbalancer.server.port=8080"
 services:
   jenkins:
-    image: jenkins/jenkins:lts
-    container_name: jenkins
+    image: ${JENKINS_IMAGE:-jenkins/jenkins}:${JENKINS_VERSION:-lts}
+    container_name: ${JENKINS_CONTAINER_NAME:-tools_jenkins}
     restart: unless-stopped
     privileged: true
     user: root
     ports:
-      - "8085:8080"
-      - "50000:50000"
+      - "${JENKINS_PORT:-8085}:8080"
+      - "${JENKINS_SLAVE_PORT:-50000}:50000"
     volumes:
-      - ./jenkins_data:/var/jenkins_home
+      - ${JENKINS_DATA_PATH:-$PWD/docker-data/jenkins/data}:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - jenkins_network
+      - ${APP_NETWORK_NAME:-app_network}
     mem_reservation: 50M
-    mem_limit: 512M
+    mem_limit: 1G
+    <<: *labels-traefik-jenkins
+
 networks:
-  jenkins_network:
+  app_network:
+    name: ${APP_NETWORK_NAME:-app_network}
     driver: bridge
+    external: true

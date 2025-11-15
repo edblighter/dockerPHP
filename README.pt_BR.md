@@ -10,7 +10,7 @@ Um ambiente Docker completo para desenvolvimento PHP local, oferecendo uma sele�
 
 - **Múltiplas Versões do PHP:** Alterne entre PHP 5.6, 7.4, 8.2, 8.3 e 8.4.
 - **Servidores Web Flexíveis:** Escolha entre Nginx (padrão) ou Caddy com HTTPS automático.
-- **Variedade de Bancos de Dados:** Suporta MySQL (padrão), MariaDB e PostgreSQL.
+- **Variedade de Bancos de Dados:** Suporta MySQL (padrão), MariaDB, PostgreSQL, MongoDB, DuckDB e ClickHouse.
 - **Ferramentas Essenciais:** Inclui Redis para cache e Mailpit para teste de e-mails.
 - **Gerenciamento Fácil:** Use `run.sh` para operações de linha de comando ou `menu.sh` para uma experiência interativa.
 - **Serviços Auxiliares:** Inclui serviços opcionais como Portainer, Traefik e Jenkins para gerenciamento avançado e CI/CD.
@@ -74,7 +74,7 @@ O script `run.sh` fornece uma maneira direta de gerenciar o ambiente.
 | Opção | Descrição | Padrão |
 |---|---|---|
 | `-w`, `--web <servidor>` | Escolha um servidor web (`nginx` ou `caddy`). | `nginx` |
-| `-d`, `--database <db>` | Escolha um banco de dados (`mysql`, `mariadb`, ou `postgres`). | `mysql` |
+| `-d`, `--database <db>` | Escolha um banco de dados (`mysql`, `mariadb`, `postgres`, `mongodb`, `duckdb` ou `clickhouse`). | `mysql` |
 | `-H`, `--help` | Exibe a tela de ajuda. | |
 
 **Comandos:**
@@ -88,6 +88,12 @@ O script `run.sh` fornece uma maneira direta de gerenciar o ambiente.
 ```bash
 # Iniciar com Nginx e MySQL
 ./run.sh -w nginx -d mysql up
+
+# Iniciar com Nginx e MongoDB
+./run.sh -w nginx -d mongodb up
+
+# Iniciar com Caddy e ClickHouse
+./run.sh -w caddy -d clickhouse up
 
 # Parar o ambiente
 ./run.sh down
@@ -107,7 +113,7 @@ Esta configuração inclui uma variedade de serviços que podem ser combinados p
 |---|---|
 | **PHP-FPM** | Interpretador PHP com versões de 5.6 a 8.4. |
 | **Servidor Web** | Nginx ou Caddy. |
-| **Banco de Dados** | MySQL, MariaDB ou PostgreSQL. |
+| **Banco de Dados** | MySQL, MariaDB, PostgreSQL, MongoDB, DuckDB ou ClickHouse. |
 | **Redis** | Armazenamento de dados em memória para cache. |
 | **Mailpit** | Ferramenta de teste de e-mail. |
 
@@ -116,7 +122,7 @@ Estes serviços são opcionais e podem ser iniciados independentemente.
 
 | Serviço | Descrição | Acesso |
 |---|---|---|
-| **DBAdmin** | phpMyAdmin para MySQL/MariaDB ou Adminer para PostgreSQL. | [http://dbadmin.localhost:8000](http://dbadmin.localhost:8000) |
+| **DBAdmin** | phpMyAdmin para MySQL/MariaDB ou Adminer para PostgreSQL, MongoDB, DuckDB e ClickHouse. | [http://dbadmin.localhost:8000](http://dbadmin.localhost:8000) |
 | **Portainer** | UI de gerenciamento do Docker. | [http://manager.localhost:9000](http://manager.localhost:9000) |
 | **Traefik** | Proxy reverso e balanceador de carga. | [http://localhost:8080](http://localhost:8080) (Dashboard) |
 | **Jenkins** | Servidor de automação de CI/CD. | [http://localhost:8085](http://localhost:8085) |
@@ -133,6 +139,9 @@ Para informações detalhadas sobre cada serviço, incluindo configuração e us
 - [MySQL](./services/mysql/README.md)
 - [MariaDB](./services/mariadb/README.md)
 - [PostgreSQL](./services/postgres/README.md)
+- [MongoDB](./services/mongodb/README.md)
+- [DuckDB](./services/duckdb/README.md)
+- [ClickHouse](./services/clickhouse/README.md)
 - [Redis](./services/redis/README.md)
 - [Mailpit](./services/mailpit/README.md)
 - [PHPMyAdmin](./services/phpmyadmin/README.md)
@@ -146,6 +155,7 @@ Para informações detalhadas sobre cada serviço, incluindo configuração e us
 ## ⚙️ Configuração
 
 - **Variáveis de Ambiente:** Personalize versões, portas e outras configurações em `.env.app`.
+- **Ambientes Específicos de Serviços:** Serviços individuais podem ter seus próprios arquivos `.env` (ex: `.env.mongodb`, `.env.duckdb`, `.env.clickhouse`, `.env.jenkins`) para configurações específicas.
 - **Configuração do PHP:** Ajuste as configurações do PHP em `services/php/conf/php.ini` e `www.conf`.
 - **Configuração dos Serviços:** Modifique os arquivos `docker-compose.yml` e os arquivos `.env` dentro do diretório de cada serviço para alterações mais avançadas.
 

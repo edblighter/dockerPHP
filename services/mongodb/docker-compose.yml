@@ -1,18 +1,51 @@
+# Container running the MongoDB
+# Note: The volumes at this container are refered at the root folder of the project.
+# Befor running this service run the command at the root folder:
+# openssl rand -base64 20 > docker-data/mongodb/db_root_password.txt
+# Run the service at the root folder using the -f flag.
+# Ex: docker compose -f services/mongodb/docker-compose.yml --env-file .env.app up -d
+#
+# Default host port is 27017 and can be changed with the env variables.
+# This service runs with a database admin tool for easy management.
+# The database admin default address is http://dbadmin.localhost:8000
+#
+x-mongodb-traefik: &labels-traefik-mongodb
+  labels:
+    - "traefik.enable=true"
+    - "traefik.tcp.routers.mongodb.entrypoints=mongodb"
+    - "traefik.tcp.services.mongodb.loadbalancer.server.port=${MONGODB_PORT:-27017}"
 services:
-  mongodb:
-    image: mongo:latest
-    container_name: app_mongodb
+  db:
+    image: ${MONGODB_IMAGE:-mongo}:${MONGODB_VERSION:-latest}
+    container_name: ${MONGODB_CONTAINER_NAME:-app_mongodb}
+    restart: always
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    <<: *labels-traefik-mongodb
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: change_this_password
+      MONGO_INITDB_ROOT_USERNAME: ${APP_MONGODB_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${APP_MONGODB_PASSWORD:-change_this_password}
+      MONGO_INITDB_DATABASE: ${APP_DATABASE_NAME:-app}
     ports:
-      - "27017:27017"
+      - "${MONGODB_PORT:-27017}:27017"
     volumes:
-      - mongo_data:/data/db
+      - ${MONGODBDATA_PATH:-/tmp/mongodb}:/data/db
     networks:
       - ${APP_NETWORK_NAME:-app_network}
+    mem_reservation: 100M
+    mem_limit: 512M
+  dbadmin:
+    extends:
+      file: $PWD/services/adminer/docker-compose.yml
+      service: dbadmin
+    depends_on:
+      - db
+
 networks:
   app_network:
     name: ${APP_NETWORK_NAME:-app_network}
     driver: bridge
-    external: true

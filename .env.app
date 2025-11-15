@@ -7,6 +7,10 @@ APP_CONTAINER_NAME=app_php  # Container running the php-fpm(Default port 9000)
 MYSQL_CONTAINER_NAME=app_mysql  # Container running the MySQL intance(Default port 3306 - Change at MYSQL_PORT variable)
 MARIADB_CONTAINER_NAME=app_mariadb  # Container running the MariaDB intance(Default port 3306 - Change at MYSQL_PORT variable)
 POSTGRES_CONTAINER_NAME=app_postgres    # Container running the PostgreSQL intance(Default port 5432 - Change at POSTGRES_PORT)
+MONGODB_CONTAINER_NAME=app_mongodb    # Container running the MongoDB instance(Default port 27017)
+DUCKDB_CONTAINER_NAME=app_duckdb    # Container running the DuckDB instance
+CLICKHOUSE_CONTAINER_NAME=app_clickhouse    # Container running the ClickHouse instance
+JENKINS_CONTAINER_NAME=tools_jenkins    # Container running the Jenkins instance
 REDIS_CONTAINER=app_redis   # Container running the Redis instance (Default port 6379 - Change at APP_REDIS_PORT variable)
 PHPMYADMIN_CONTAINER_NAME=app_phpmyadmin    # Container running the phpmyadmin to administer the MySQL/MariaDB when selected(Default address http://dbadmin.localhost:8000)
 DBADMIN_CONTAINER_NAME=app_dbadmin  # Container running the Adminer instance used the administer the PostgreSQL when selected(Default address http://dbadmin.localhost:8000)
@@ -31,6 +35,12 @@ APP_HTTP_PORT=8000 # Default port to be used for http access(if your port 80 is 
 APP_HTTPS_PORT=443 # Default port to be used for https access(if your port 443 is free consider changing)
 MYSQL_PORT=3306     # Default mysql/mariadb port
 POSTGRES_PORT=5432  # Default postgresql port
+MONGODB_PORT=27017  # Default mongodb port
+DUCKDB_PORT=5432    # Default duckdb port (for postgres compatibility)
+CLICKHOUSE_HTTP_PORT=8123  # Default clickhouse http port
+CLICKHOUSE_NATIVE_PORT=9000  # Default clickhouse native port
+JENKINS_PORT=8085  # Default jenkins port
+JENKINS_SLAVE_PORT=50000  # Default jenkins slave port
 APP_REDIS_PORT=6379 # Defaul redis port
 MAILPIT_PORT_SMTP=1025  # Default smtp port to send emails to mailpit
 MAILPIT_PORT_UI=8025   # Default port to access the mailpit UI
@@ -62,6 +72,31 @@ APP_MYSQL_PASSWORD=secret
 MYSQLDATA_PATH="$PWD/docker-data/mysql/mysqldata"
 MARIADBDATA_PATH="$PWD/docker-data/mariadb/mysqldata"
 
+# MONGODB ENV
+MONGODB_IMAGE=mongo
+MONGODB_VERSION=latest      # RECOMMENDED TAGS[latest, 7, 6, 5]
+APP_MONGODB_USER=admin
+APP_MONGODB_PASSWORD=change_this_password
+MONGODBDATA_PATH="$PWD/docker-data/mongodb/data"
+
+# DUCKDB ENV
+DUCKDB_IMAGE=duckdb/duckdb
+DUCKDB_VERSION=latest      # RECOMMENDED TAGS[latest, 0.10.2, 0.9.2]
+DUCKDB_DATA_PATH="$PWD/docker-data/duckdb/data"
+
+# CLICKHOUSE ENV
+CLICKHOUSE_IMAGE=clickhouse/clickhouse-server
+CLICKHOUSE_VERSION=latest      # RECOMMENDED TAGS[latest, 24.8, 23.8]
+CLICKHOUSE_USER=admin
+CLICKHOUSE_PASSWORD=change_this_password
+CLICKHOUSE_DB=default
+CLICKHOUSEDATA_PATH="$PWD/docker-data/clickhouse/data"
+
+# JENKINS ENV
+JENKINS_IMAGE=jenkins/jenkins
+JENKINS_VERSION=lts      # RECOMMENDED TAGS[lts, latest]
+JENKINS_DATA_PATH="$PWD/docker-data/jenkins/data"
+
 # PHPMYADMIN
 PHPMYADMIN_IMAGE=phpmyadmin     # RECOMMENDED IMAGE [phpmyadmin, phpmyadmin/phpmyadmin]
 PHPMYADMIN_VERSION=latest   # RECOMMENDED TAGS[latest, fpm-alpine]
@@ -82,7 +117,7 @@ ADMINER_VERSION=latest    # RECOMMENDED TAGS[latest, 5, 5-4.2.1]
 ADMINER_DEFAULT_DRIVER=pgsql
 
 # REDIS ENV
-REDIS_IMAGE=redis      
+REDIS_IMAGE=redis
 REDIS_VERSION=alpine    # RECOMMENDED TAGS[latest, alpine,  8-bookworm, 8-alpine]
 REDIS_MEM_LIMIT=500M
 

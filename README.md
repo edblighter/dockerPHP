@@ -10,7 +10,7 @@ A complete Docker environment for local PHP development, offering a selection of
 
 - **Multiple PHP Versions:** Switch between PHP 5.6, 7.4, 8.2, 8.3, and 8.4.
 - **Flexible Web Servers:** Choose between Nginx (default) or Caddy with automatic HTTPS.
-- **Database Variety:** Supports MySQL (default), MariaDB, and PostgreSQL.
+- **Database Variety:** Supports MySQL (default), MariaDB, PostgreSQL, MongoDB, DuckDB, and ClickHouse.
 - **Essential Tools:** Comes with Redis for caching and Mailpit for email testing.
 - **Easy Management:** Use `run.sh` for command-line operations or `menu.sh` for an interactive experience.
 - **Auxiliary Services:** Includes optional services like Portainer, Traefik, and Jenkins for advanced management and CI/CD.
@@ -74,7 +74,7 @@ The `run.sh` script provides a direct way to manage the environment.
 | Option | Description | Default |
 |---|---|---|
 | `-w`, `--web <server>` | Choose a web server (`nginx` or `caddy`). | `nginx` |
-| `-d`, `--database <db>` | Choose a database (`mysql`, `mariadb`, or `postgres`). | `mysql` |
+| `-d`, `--database <db>` | Choose a database (`mysql`, `mariadb`, `postgres`, `mongodb`, `duckdb`, or `clickhouse`). | `mysql` |
 | `-H`, `--help` | Display the help screen. | |
 
 **Commands:**
@@ -88,6 +88,12 @@ The `run.sh` script provides a direct way to manage the environment.
 ```bash
 # Start with Nginx and MySQL
 ./run.sh -w nginx -d mysql up
+
+# Start with Nginx and MongoDB
+./run.sh -w nginx -d mongodb up
+
+# Start with Caddy and ClickHouse
+./run.sh -w caddy -d clickhouse up
 
 # Stop the environment
 ./run.sh down
@@ -107,7 +113,7 @@ This setup includes a variety of services that can be combined to fit your needs
 |---|---|
 | **PHP-FPM** | PHP interpreter with versions 5.6 to 8.4. |
 | **Web Server** | Nginx or Caddy. |
-| **Database** | MySQL, MariaDB, or PostgreSQL. |
+| **Database** | MySQL, MariaDB, PostgreSQL, MongoDB, DuckDB, or ClickHouse. |
 | **Redis** | In-memory data store for caching. |
 | **Mailpit** | Email testing tool. |
 
@@ -116,7 +122,7 @@ These services are optional and can be started independently.
 
 | Service | Description | Access |
 |---|---|---|
-| **DBAdmin** | phpMyAdmin for MySQL/MariaDB or Adminer for PostgreSQL. | [http://dbadmin.localhost:8000](http://dbadmin.localhost:8000) |
+| **DBAdmin** | phpMyAdmin for MySQL/MariaDB or Adminer for PostgreSQL, MongoDB, DuckDB, and ClickHouse. | [http://dbadmin.localhost:8000](http://dbadmin.localhost:8000) |
 | **Portainer** | Docker management UI. | [http://manager.localhost:9000](http://manager.localhost:9000) |
 | **Traefik** | Reverse proxy and load balancer. | [http://localhost:8080](http://localhost:8080) (Dashboard) |
 | **Jenkins** | CI/CD automation server. | [http://localhost:8085](http://localhost:8085) |
@@ -133,6 +139,9 @@ For detailed information on each service, including configuration and advanced u
 - [MySQL](./services/mysql/README.md)
 - [MariaDB](./services/mariadb/README.md)
 - [PostgreSQL](./services/postgres/README.md)
+- [MongoDB](./services/mongodb/README.md)
+- [DuckDB](./services/duckdb/README.md)
+- [ClickHouse](./services/clickhouse/README.md)
 - [Redis](./services/redis/README.md)
 - [Mailpit](./services/mailpit/README.md)
 - [PHPMyAdmin](./services/phpmyadmin/README.md)
@@ -146,6 +155,7 @@ For detailed information on each service, including configuration and advanced u
 ## ⚙️ Configuration
 
 - **Environment Variables:** Customize versions, ports, and other settings in `.env.app`.
+- **Service-Specific Environments:** Individual services may have their own `.env` files (e.g. `.env.mongodb`, `.env.duckdb`, `.env.clickhouse`, `.env.jenkins`) for specific configurations.
 - **PHP Configuration:** Adjust PHP settings in `services/php/conf/php.ini` and `www.conf`.
 - **Service Configuration:** Modify the `docker-compose.yml` files and `.env` files within each service's directory for more advanced changes.
 

@@ -1,0 +1,50 @@
+# Container running the DuckDB
+# Note: The volumes at this container are refered at the root folder of the project.
+# Run the service at the root folder using the -f flag.
+# Ex: docker compose -f services/duckdb/docker-compose.yml --env-file .env.app up -d
+#
+# Default host port is 8086 for HTTP API and 5432 for PostgreSQL compatibility
+# This service runs with a database admin tool for easy management.
+# The database admin default address is http://dbadmin.localhost:8000
+#
+x-duckdb-traefik: &labels-traefik-duckdb
+  labels:
+    - "traefik.enable=true"
+    - "traefik.tcp.routers.duckdb.entrypoints=duckdb"
+    - "traefik.tcp.services.duckdb.loadbalancer.server.port=${DUCKDB_PORT:-5432}"
+services:
+  db:
+    image: ${DUCKDB_IMAGE:-duckdb/duckdb}:${DUCKDB_VERSION:-latest}
+    container_name: ${DUCKDB_CONTAINER_NAME:-app_duckdb}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 5 duckdb --cmd 'PRAGMA version;' /tmp/test.db && rm /tmp/test.db || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    <<: *labels-traefik-duckdb
+    ports:
+      - "8086:8086"  # HTTP API
+      - "${DUCKDB_PORT:-5432}:5432"  # PostgreSQL compatibility port
+    volumes:
+      - ${DUCKDB_DATA_PATH:-/tmp/duckdb}:/var/lib/duckdb
+    networks:
+      - ${APP_NETWORK_NAME:-app_network}
+    mem_reservation: 100M
+    mem_limit: 512M
+  dbadmin:
+    extends:
+      file: $PWD/services/adminer/docker-compose.yml
+      service: dbadmin
+    depends_on:
+      - db
+
+volumes:
+  duckdb_data:
+    name: duckdb_data
+
+networks:
+  app_network:
+    name: ${APP_NETWORK_NAME:-app_network}
+    driver: bridge

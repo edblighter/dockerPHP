@@ -19,6 +19,10 @@ services:
     extends:
       file: ./services/redis/docker-compose.yml
       service: redis
+  jenkins:
+    extends:
+      file: ./services/jenkins/docker-compose.yml
+      service: jenkins
 volumes:
   cache:
     name: redis_cache

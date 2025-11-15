@@ -58,6 +58,12 @@ ports_check() {
         "${PHPMYADMIN_PORT:-8000}"
         "${MYSQL_PORT:-3306}"
         "${POSTGRES_PORT:-5432}"
+        "${MONGODB_PORT:-27017}"
+        "${DUCKDB_PORT:-5432}"
+        "${CLICKHOUSE_HTTP_PORT:-8123}"
+        "${CLICKHOUSE_NATIVE_PORT:-9000}"
+        "${JENKINS_PORT:-8085}"
+        "${JENKINS_SLAVE_PORT:-50000}"
         "${REDIS_PORT:-6379}"
         "${MAILPIT_PORT_SMTP:-1025}"
         "${MAILPIT_PORT_UI:-8025}"
@@ -131,15 +137,21 @@ database_menu() {
         echo "1) MySQL"
         echo "2) MariaDB"
         echo "3) PostgreSQL"
-        echo "4) Go Back"
+        echo "4) MongoDB"
+        echo "5) DuckDB"
+        echo "6) ClickHouse"
+        echo "7) Go Back"
         echo
-        read -rp "Select an option [1-4]: " choice
+        read -rp "Select an option [1-7]: " choice
 
         case "$choice" in
             1) DATABASE="mysql"; break ;;
             2) DATABASE="mariadb"; break ;;
             3) DATABASE="postgres"; break ;;
-            4) break ;;
+            4) DATABASE="mongodb"; break ;;
+            5) DATABASE="duckdb"; break ;;
+            6) DATABASE="clickhouse"; break ;;
+            7) break ;;
             *) echo "Invalid option"; pause ;;
         esac
     done
@@ -152,7 +164,7 @@ summary_menu() {
         local db_admin_tool="Not applicable"
         if [[ "$DATABASE" == "mysql" || "$DATABASE" == "mariadb" ]]; then
             db_admin_tool="PHPMyAdmin"
-        elif [[ "$DATABASE" == "postgres" ]]; then
+        elif [[ "$DATABASE" == "postgres" || "$DATABASE" == "mongodb" || "$DATABASE" == "duckdb" || "$DATABASE" == "clickhouse" ]]; then
             db_admin_tool="Adminer"
         fi
 

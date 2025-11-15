@@ -1,0 +1,63 @@
+# Container running the ClickHouse
+# Note: The volumes at this container are refered at the root folder of the project.
+# Befor running this service run the command at the root folder:
+# openssl rand -base64 20 > docker-data/clickhouse/db_root_password.txt
+# Run the service at the root folder using the -f flag.
+# Ex: docker compose -f services/clickhouse/docker-compose.yml --env-file .env.app up -d
+#
+# Default host ports are 8123 for HTTP, 9000 for native interface, and 9009 for replication
+# This service runs with a database admin tool for easy management.
+# The database admin default address is http://dbadmin.localhost:8000
+#
+x-clickhouse-traefik: &labels-traefik-clickhouse
+  labels:
+    - "traefik.enable=true"
+    - "traefik.tcp.routers.clickhouse.entrypoints=clickhouse"
+    - "traefik.tcp.services.clickhouse.loadbalancer.server.port=${CLICKHOUSE_NATIVE_PORT:-9000}"
+services:
+  db:
+    image: ${CLICKHOUSE_IMAGE:-clickhouse/clickhouse-server}:${CLICKHOUSE_VERSION:-latest}
+    container_name: ${CLICKHOUSE_CONTAINER_NAME:-app_clickhouse}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8123/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    <<: *labels-traefik-clickhouse
+    ports:
+      - "${CLICKHOUSE_HTTP_PORT:-8123}:${CLICKHOUSE_HTTP_PORT:-8123}"  # HTTP interface
+      - "${CLICKHOUSE_NATIVE_PORT:-9000}:${CLICKHOUSE_NATIVE_PORT:-9000}"  # Native interface
+      - "9009:9009"  # Replication
+    environment:
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-default}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-admin}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-change_this_password}
+    volumes:
+      - ${CLICKHOUSEDATA_PATH:-/tmp/clickhouse}:/var/lib/clickhouse
+      - $PWD/services/clickhouse/conf/config.xml:/etc/clickhouse-server/config.d/config.xml
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    networks:
+      - ${APP_NETWORK_NAME:-app_network}
+    mem_reservation: 100M
+    mem_limit: 1G
+  dbadmin:
+    extends:
+      file: $PWD/services/adminer/docker-compose.yml
+      service: dbadmin
+    depends_on:
+      - db
+
+volumes:
+  clickhouse_data:
+    name: clickhouse_data
+
+networks:
+  app_network:
+    name: ${APP_NETWORK_NAME:-app_network}
+    driver: bridge
