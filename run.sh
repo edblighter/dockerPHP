@@ -180,15 +180,37 @@ print_summary() {
 # Function to start the services
 run_up() {
     echo "Creating minimal data folders..."
-    mkdir -p "docker-data/php" "docker-data/${DATABASE}" "docker-data/${WEBSERVER}"
+    mkdir -p "docker-data/php" "docker-data/${WEBSERVER}"
 
-    if [[ "${DATABASE}" = "postgres" ]]; then
-        echo "Adjusting permissions for the postgres log folder..."
-        mkdir -p "docker-data/${DATABASE}/logs"
-        sudo chown :70 "docker-data/${DATABASE}/logs"
-        sudo chmod 770 "docker-data/${DATABASE}/logs"
-        sudo chmod g+s "docker-data/${DATABASE}/logs"
-    fi
+    # Create database-specific data directories
+    case "${DATABASE}" in
+        mysql)
+            mkdir -p "docker-data/mysql/mysqldata"
+            ;;
+        mariadb)
+            mkdir -p "docker-data/mariadb/mysqldata"
+            ;;
+        postgres)
+            mkdir -p "docker-data/postgres/data"
+            echo "Adjusting permissions for the postgres log folder..."
+            mkdir -p "docker-data/postgres/logs"
+            sudo chown :70 "docker-data/postgres/logs"
+            sudo chmod 770 "docker-data/postgres/logs"
+            sudo chmod g+s "docker-data/postgres/logs"
+            ;;
+        mongodb)
+            mkdir -p "docker-data/mongodb/data"
+            ;;
+        duckdb)
+            mkdir -p "docker-data/duckdb/data"
+            ;;
+        clickhouse)
+            mkdir -p "docker-data/clickhouse/data"
+            ;;
+        *)
+            mkdir -p "docker-data/${DATABASE}"
+            ;;
+    esac
 
     echo "Generating the database root password file..."
     mkdir -p "docker-data/${DATABASE}"

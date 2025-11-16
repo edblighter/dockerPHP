@@ -1,0 +1,48 @@
+# Container running the Beekeeper Studio instance used to manage multiple databases.
+# Default address via proxy http://beekeeper.localhost:8080
+# or
+# Default address for standalone service http://127.0.0.1:8080
+#
+# You can spin a standalone version with the default variables or using the .env.beekeper in this folder for custom values.
+# Ex: docker compose -f services/beekeper/docker-compose.yml up -d
+# or using the .env.beekeper
+# docker compose -f services/beekeper/docker-compose.yml --env-file services/beekeper/.env.beekeper up -d
+#
+x-beekeeper-traefik: &labels-traefik-beekeeper
+  labels:
+    - "traefik.enable=false"
+#    - "traefik.http.routers.beekeeper.rule=Host(`beekeeper.localhost`)"
+#    - "traefik.http.routers.beekeeper.entrypoints=web"
+#    - "traefik.http.services.beekeeper.loadbalancer.server.port=8080"
+
+services:
+  beekeeper:
+    build:
+      context: .
+      dockerfile: services/beekeper/Dockerfile
+    container_name: ${BEEKEEPER_CONTAINER_NAME:-app_beekeeper}
+    restart: always
+    healthcheck:
+      test: wget --no-verbose --tries=1 --output-document=/dev/null http://127.0.0.1:8080 &> /dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 2
+      start_period: 0s
+    << : *labels-traefik-beekeeper
+    environment:
+      VNC_RESOLUTION: ${BEEKEEPER_VNC_RESOLUTION:-1280x800}
+      VNC_COL_DEPTH: ${BEEKEEPER_VNC_COLOR_DEPTH:-24}
+      TZ: ${APP_TIMEZONE:-America/Sao_Paulo}
+    ports:
+      - ${BEEKEEPER_EXTERNAL_PORT:-8080}:${BEEKEEPER_INTERNAL_PORT:-8080}   # Port 8080 will be used to access Beekeeper Studio via noVNC
+    expose:
+      - 8080
+    networks:
+      - ${APP_NETWORK_NAME:-app_network}
+    mem_reservation: 100M
+    mem_limit: ${BEEKEEPER_MEM_LIMIT:-512M}
+
+networks:
+  app_network:
+    name: ${APP_NETWORK_NAME:-app_network}
+    driver: bridge

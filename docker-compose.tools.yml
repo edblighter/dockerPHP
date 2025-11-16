@@ -23,6 +23,10 @@ services:
     extends:
       file: ./services/jenkins/docker-compose.yml
       service: jenkins
+  beekeeper:
+    extends:
+      file: ./services/beekeper/docker-compose.yml
+      service: beekeeper
 volumes:
   cache:
     name: redis_cache

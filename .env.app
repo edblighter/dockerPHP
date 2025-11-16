@@ -14,6 +14,7 @@ JENKINS_CONTAINER_NAME=tools_jenkins    # Container running the Jenkins instance
 REDIS_CONTAINER=app_redis   # Container running the Redis instance (Default port 6379 - Change at APP_REDIS_PORT variable)
 PHPMYADMIN_CONTAINER_NAME=app_phpmyadmin    # Container running the phpmyadmin to administer the MySQL/MariaDB when selected(Default address http://dbadmin.localhost:8000)
 DBADMIN_CONTAINER_NAME=app_dbadmin  # Container running the Adminer instance used the administer the PostgreSQL when selected(Default address http://dbadmin.localhost:8000)
+BEEKEEPER_CONTAINER_NAME=app_beekeeper    # Container running the Beekeeper Studio instance (Default address http://beekeeper.localhost:8080)
 
 #WEBSERVER
 APP_NGINX_CONTAINER_NAME=app_nginx  # Container running the Nginx web server (Default to HTTP_PORT = 8000)
@@ -44,6 +45,7 @@ JENKINS_SLAVE_PORT=50000  # Default jenkins slave port
 APP_REDIS_PORT=6379 # Defaul redis port
 MAILPIT_PORT_SMTP=1025  # Default smtp port to send emails to mailpit
 MAILPIT_PORT_UI=8025   # Default port to access the mailpit UI
+BEEKEEPER_EXTERNAL_PORT=8080   # External port to access Beekeeper Studio via noVNC
 
 # MISC
 APP_TIMEZONE="America/Manaus"       # Define the a timezone to adjust de date/time of logs inside containers
@@ -133,6 +135,13 @@ NGINX_MEM_LIMIT=256M  # Memory limit for the nginx container
 CADDY_IMAGE=caddy
 CADDY_VERSION=alpine    # RECOMMENDED TAGS[latest, alpine]
 CADDY_MEM_LIMIT=300M
+
+# BEEKEEPER ENV
+BEEKEEPER_EXTERNAL_PORT=8080              # External port for Beekeeper Studio
+BEEKEEPER_INTERNAL_PORT=8080              # Internal port used by Beekeeper Studio container
+BEEKEEPER_VNC_RESOLUTION=1280x800         # Resolution for the VNC session
+BEEKEEPER_VNC_COLOR_DEPTH=24              # Color depth for the VNC session
+BEEKEEPER_MEM_LIMIT=512M                  # Memory limit for the Beekeeper Studio container
 
 # PORTAINER ENV
 PORTAINER_IMAGE=portainer/portainer-ce
