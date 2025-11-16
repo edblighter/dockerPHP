@@ -3,10 +3,10 @@
 # or
 # Default address for standalone service http://127.0.0.1:8080
 #
-# You can spin a standalone version with the default variables or using the .env.beekeper in this folder for custom values.
-# Ex: docker compose -f services/beekeper/docker-compose.yml up -d
-# or using the .env.beekeper
-# docker compose -f services/beekeper/docker-compose.yml --env-file services/beekeper/.env.beekeper up -d
+# You can spin a standalone version with the default variables or using the .env.beekeeper-studio in this folder for custom values.
+# Ex: docker compose -f services/beekeeper-studio/docker-compose.yml up -d
+# or using the .env.beekeeper-studio
+# docker compose -f services/beekeeper-studio/docker-compose.yml --env-file services/beekeeper-studio/.env.beekeeper-studio up -d
 #
 x-beekeeper-traefik: &labels-traefik-beekeeper
   labels:
@@ -19,7 +19,7 @@ services:
   beekeeper:
     build:
       context: .
-      dockerfile: services/beekeper/Dockerfile
+      dockerfile: $PWD/services/beekeeper-studio/Dockerfile
     container_name: ${BEEKEEPER_CONTAINER_NAME:-app_beekeeper}
     restart: always
     healthcheck:
@@ -46,3 +46,4 @@ networks:
   app_network:
     name: ${APP_NETWORK_NAME:-app_network}
     driver: bridge
+    attachable: true

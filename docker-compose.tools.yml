@@ -25,7 +25,7 @@ services:
       service: jenkins
   beekeeper:
     extends:
-      file: ./services/beekeper/docker-compose.yml
+      file: ./services/beekeeper-studio/docker-compose.yml
       service: beekeeper
 volumes:
   cache:

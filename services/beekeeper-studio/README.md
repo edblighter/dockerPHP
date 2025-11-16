@@ -4,7 +4,7 @@ This service provides Beekeeper Studio, a modern and easy-to-use database manage
 
 ## Configuration
 
-The service can be configured using environment variables. You can use the `.env.beekeper` file to override default values.
+The service can be configured using environment variables. You can use the `.env.beekeeper-studio` file to override default values.
 
 ### Environment Variables
 
@@ -22,16 +22,16 @@ The service can be configured using environment variables. You can use the `.env
 To run Beekeeper Studio standalone:
 
 ```bash
-docker compose -f services/beekeper/docker-compose.yml up -d
+docker compose -f services/beekeeper-studio/docker-compose.yml up -d
 ```
 
 Or with custom environment:
 
 ```bash
-docker compose -f services/beekeper/docker-compose.yml --env-file services/beekeper/.env.beekeper up -d
+docker compose -f services/beekeeper-studio/docker-compose.yml --env-file services/beekeeper-studio/.env.beekeeper-studio up -d
 ```
 
-Access Beekeeper Studio at `http://127.0.0.1:8080`
+Access Beekeeper Studio at `http://127.0.0.1:8080` or via Traefik at `http://beekeeper.localhost:8080` (if you have the proper DNS resolution setup).
 
 ### Integrated
 

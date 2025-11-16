@@ -137,7 +137,7 @@ CADDY_VERSION=alpine    # RECOMMENDED TAGS[latest, alpine]
 CADDY_MEM_LIMIT=300M
 
 # BEEKEEPER ENV
-BEEKEEPER_EXTERNAL_PORT=8080              # External port for Beekeeper Studio
+BEEKEEPER_EXTERNAL_PORT=8088              # External port for Beekeeper Studio
 BEEKEEPER_INTERNAL_PORT=8080              # Internal port used by Beekeeper Studio container
 BEEKEEPER_VNC_RESOLUTION=1280x800         # Resolution for the VNC session
 BEEKEEPER_VNC_COLOR_DEPTH=24              # Color depth for the VNC session
